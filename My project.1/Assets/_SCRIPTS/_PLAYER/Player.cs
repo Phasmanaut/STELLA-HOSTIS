@@ -1,20 +1,25 @@
 using System;
-using System.Numerics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 public class Player : MonoBehaviour
 {
-    public float speed = 5f;
+    private float invincibilityTime = 0;
+    public float invincibilityDuration = 0.3f;
+    public float speed = 5f;//not a very good var name
     public float rotation = .05f;
     public string explosionType = "Player";
+    
+
     public GameObject Explosion;
     private GameStats gameStats;
-    public AudioClip hurt1;
-    public AudioClip hurt2;
-    public AudioClip hurt3;
+    
+
+    public AudioClip hurt1;public AudioClip hurt2;public AudioClip hurt3;
+
+
+
     void Start()
     {
         transform.position = new Vector3(0, 0.5f, 0);
@@ -38,8 +43,14 @@ public class Player : MonoBehaviour
     {    // Check input keys
         bool right = Input.GetKey(KeyCode.D);
         bool left = Input.GetKey(KeyCode.A);
+
+        bool up = Input.GetKey(KeyCode.W);
+        bool down = Input.GetKey(KeyCode.S);
+
         Vector3 pos = transform.position;
 
+        if(invincibilityTime > 0) { invincibilityTime -= Time.deltaTime; }
+        
         // Adjust target rotation and speed based on input, easing everything instead of snapping
         if (right && !left && pos.x <= 5.75)
         {
@@ -61,6 +72,22 @@ public class Player : MonoBehaviour
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
         }
 
+
+
+        //vertical movement
+        if (up && !down && pos.y <= 2)
+        {
+            pos.y += (speed*.75f)*Time.deltaTime;
+        }
+        else if (down && !up && pos.y >= .25)
+        {
+            pos.y -= (speed * .75f) * Time.deltaTime;
+        }
+
+
+
+
+
         pos.x += currentSpeed * Time.deltaTime;
 
         // Apply rotation (yaw + bank) & movement to the player
@@ -70,13 +97,14 @@ public class Player : MonoBehaviour
     }
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.CompareTag("EnemyProjectile"))
+        if (col.gameObject.CompareTag("EnemyProjectile") && invincibilityTime <= 0)
         {
             gameStats.PlayerHit();
             Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
             AudioClip[] hurtSounds = { hurt1, hurt2, hurt3 };
             AudioClip randomHurt = hurtSounds[UnityEngine.Random.Range(0, hurtSounds.Length)];
             AudioSource.PlayClipAtPoint(randomHurt, gameStats.transform.position, 1.0f);
+            invincibilityTime = invincibilityDuration;
         }
     }
 }

@@ -12,14 +12,15 @@ public class Enemy_A : MonoBehaviour
     public GameObject Explosion;
 
     private int points = 50;
-    public float speed = 0.5f;
-    public float duration = 3f;
+    private float speed = 0.5f;
+    private float duration = 3f;
     private float timeElapsed = 0f;
     private bool moveRight = true;
     public string explosionType = "EnemyA";
 
     void Start()
     {
+        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType; //spawn Explosion
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
         timeElapsed +=duration/2;//head start to keep enemies centered
         

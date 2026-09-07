@@ -1,27 +1,20 @@
 using UnityEngine;
-public class Enemy_B : MonoBehaviour
+public class Enemy_Ab : MonoBehaviour
 {
 
-    private GameStats gameStats;
-    private SpriteRenderer spriteRenderer;
-    public GameObject projectile;
-    public GameObject floatingPoints;
-    public AudioClip death;
-    public AudioClip shoot;
-    public GameObject Explosion;
+    private GameStats gameStats;public GameObject projectile;public GameObject floatingPoints;public AudioClip death;public AudioClip shoot;public GameObject Explosion;
 
     private int points = 75;//more points
-    public float speed = 1.5f; // faster than Enemy_A's 0.5f
-    public float duration = 1.5f; // shorter than Enemy_A's 3f = fires more often
+    private float speed = 1.5f; // faster than Enemy_A's 0.5f
+    private float duration = 1.5f; // shorter than Enemy_A's 3f = fires more often
 
     private float timeElapsed = 0f;
-
     private bool moveRight = true;
-
     public string explosionType = "EnemyA";
 
     void Start()
     {
+        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType; //spawn Explosion
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
         timeElapsed += duration / 2; //head start to keep enemies centered
 

@@ -5340,8 +5340,12 @@ MonoBehaviour:
   pixelguy4: {fileID: 945471757}
   startCube: {fileID: 6419228595586875887, guid: a1b161b67c5f66f4aa56f093545567a6, type: 3}
   cube_die: {fileID: 1381744141}
+  levelCountdownDuration: 3
   enemy_A: {fileID: 249807260575531700, guid: 0e6c2d25ad5c7c640a7c4a7891e75ec5, type: 3}
   enemy_Ab: {fileID: 2661099994653243454, guid: 90cca9c87204788498c5c8684215da32, type: 3}
+  enemy_B: {fileID: 594656379561547482, guid: 3e07af11e096a514cae6465cbe054b7d, type: 3}
+  enemy_C: {fileID: 9014551965266006867, guid: 8d2b404feae34384ea878695ce0e3039, type: 3}
+  enemy_D: {fileID: 6146612020378829864, guid: 7f7e8e196e31dd842920638ec6d8db25, type: 3}
   spawn0x1: {fileID: 129295614}
   spawn0x2: {fileID: 1244110975}
   spawn0x3: {fileID: 1198810977}

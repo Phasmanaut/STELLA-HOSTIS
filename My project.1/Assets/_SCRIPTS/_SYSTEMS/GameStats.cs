@@ -10,7 +10,7 @@ public class GameStats : MonoBehaviour
     public int playerHealth;
     public int playerCharge;
     public bool playerAlive;
-    
+
     public int level;
     public int levelEnemies;
     public int points;
@@ -18,7 +18,7 @@ public class GameStats : MonoBehaviour
     public bool timerActive;
 
     //UI
-    public TextMeshProUGUI healthUI;public TextMeshProUGUI timerUI;public TextMeshProUGUI levelUI;public TextMeshProUGUI chargeUI;public TextMeshProUGUI pointsUI;public TextMeshPro screenText;
+    public TextMeshProUGUI healthUI; public TextMeshProUGUI timerUI; public TextMeshProUGUI levelUI; public TextMeshProUGUI chargeUI; public TextMeshProUGUI pointsUI; public TextMeshPro screenText;
 
     public AudioClip startSound;
     public AudioClip loseSound;
@@ -29,13 +29,16 @@ public class GameStats : MonoBehaviour
     private GameObject playerInstance;
 
     //pixel guy animations
-    public GameObject pixelguy1;public GameObject pixelguy2;public GameObject pixelguy3;public GameObject pixelguy4;
-    
+    public GameObject pixelguy1; public GameObject pixelguy2; public GameObject pixelguy3; public GameObject pixelguy4;
+
     //Startcube
-    public GameObject startCube;private GameObject startCubeInstance;public ParticleSystem cube_die;
-    
+    public GameObject startCube; private GameObject startCubeInstance; public ParticleSystem cube_die;
+
+    //Between-level countdown
+    public float levelCountdownDuration = 3f;
+
     //Enemies
-    public GameObject enemy_A; public GameObject enemy_Ab;
+    public GameObject enemy_A; public GameObject enemy_Ab; public GameObject enemy_B; public GameObject enemy_C; public GameObject enemy_D;
 
 
 
@@ -81,7 +84,7 @@ public class GameStats : MonoBehaviour
         UpdatePixelguy();
     }
 
-    
+
     void Update()
     {
         healthUI.text = $"{playerHealth} ";
@@ -98,10 +101,10 @@ public class GameStats : MonoBehaviour
             }
         }
 
-        
+
     }
 
-
+    //Handles the very first level start, triggered by shooting the start cube
     public void StartLevelHit()
     {
         cube_die.Play();
@@ -123,18 +126,19 @@ public class GameStats : MonoBehaviour
             Console.WriteLine($"LEVEL STARTED: {level}");
             levelEnemies = 6;
             Instantiate(enemy_A, spawn[2, 0].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[2, 8].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[3, 2].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[3, 6].transform.position, transform.rotation);
+            //Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
+            //Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
+            //Instantiate(enemy_A, spawn[2, 8].transform.position, transform.rotation);
+            //Instantiate(enemy_A, spawn[3, 2].transform.position, transform.rotation);
+            //Instantiate(enemy_A, spawn[3, 6].transform.position, transform.rotation);
+            Instantiate(enemy_B, spawn[3, 6].transform.position, transform.rotation);
 
         }
         else if (level == 2)
         {
             Console.WriteLine($"LEVEL STARTED: {level}");
             levelEnemies = 9;
-            
+
             Instantiate(enemy_A, spawn[1, 3].transform.position, transform.rotation);
             Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
             Instantiate(enemy_A, spawn[1, 5].transform.position, transform.rotation);
@@ -153,17 +157,20 @@ public class GameStats : MonoBehaviour
     {
         points += pointGain;
         levelEnemies--;
-        if(levelEnemies <= 0)
+        if (levelEnemies <= 0)
         {
             LevelEnd();
         }
     }
+
+    //Between-level transition: counts down instead of spawning a cube to shoot
     public void LevelEnd()
     {
-        screenText.text = $"START LEVEL {level + 1} ";
-        startCubeInstance = Instantiate(startCube);
         timerActive = false;
+        StartCoroutine(LevelCountdown());
     }
+
+    
 
     public void PlayerHit()
     {
@@ -174,7 +181,7 @@ public class GameStats : MonoBehaviour
             playerHealth--;
             UpdatePixelguy();
         }
-        else 
+        else
         {
             playerHealth = 0;
             EndGame();
@@ -197,38 +204,44 @@ public class GameStats : MonoBehaviour
 
     public void UpdatePixelguy()
     {
-            pixelguy1.SetActive(false);
-            pixelguy2.SetActive(false);
-            pixelguy3.SetActive(false);
-            pixelguy4.SetActive(false);
+        pixelguy1.SetActive(false);
+        pixelguy2.SetActive(false);
+        pixelguy3.SetActive(false);
+        pixelguy4.SetActive(false);
 
-            if(playerHealth ==3)
-            {
-                pixelguy1.SetActive(true);
-            }
-            if(playerHealth ==2)
-            {
-                pixelguy2.SetActive(true);
-            }
-            if(playerHealth ==1)
-            {
-                pixelguy3.SetActive(true);
-            }
-            if(playerHealth ==0)
-            {
-                pixelguy4.SetActive(true);
-            }
+        if (playerHealth == 3)
+        {
+            pixelguy1.SetActive(true);
+        }
+        if (playerHealth == 2)
+        {
+            pixelguy2.SetActive(true);
+        }
+        if (playerHealth == 1)
+        {
+            pixelguy3.SetActive(true);
+        }
+        if (playerHealth == 0)
+        {
+            pixelguy4.SetActive(true);
+        }
 
     }
 
 
 
-    //Camera Shaking below
     void CameraShake()
     {
         StartCoroutine(Shake(0.1f, 0.2f)); // duration, magnitude
     }
 
+
+
+
+
+    // Coroutine: a function that can pause execution and resume later without freezing the game.
+    // IEnumerator is the return type used by coroutines to track where execution should continue.
+    ///////////////////////////////////////////////////////
     IEnumerator Shake(float duration, float magnitude)
     {
         Camera cam = Camera.main;
@@ -245,6 +258,21 @@ public class GameStats : MonoBehaviour
         }
 
         cam.transform.localPosition = originalPos;
+    }
+    IEnumerator LevelCountdown()
+    {
+        int secondsLeft = Mathf.CeilToInt(levelCountdownDuration);
+        while (secondsLeft > 0)
+        {
+            screenText.text = $"LEVEL {level + 1} \nSTARTS IN {secondsLeft}";
+            yield return new WaitForSeconds(1f);
+            secondsLeft--;
+        }
+
+        screenText.text = $" ";
+        level++;
+        LevelStart(level);
+        AudioSource.PlayClipAtPoint(startSound, transform.position, 5.0f);
     }
 
 }
