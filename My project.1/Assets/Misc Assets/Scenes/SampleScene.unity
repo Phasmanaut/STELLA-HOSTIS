@@ -5341,6 +5341,7 @@ MonoBehaviour:
   startCube: {fileID: 6419228595586875887, guid: a1b161b67c5f66f4aa56f093545567a6, type: 3}
   cube_die: {fileID: 1381744141}
   enemy_A: {fileID: 249807260575531700, guid: 0e6c2d25ad5c7c640a7c4a7891e75ec5, type: 3}
+  enemy_Ab: {fileID: 2661099994653243454, guid: 90cca9c87204788498c5c8684215da32, type: 3}
   spawn0x1: {fileID: 129295614}
   spawn0x2: {fileID: 1244110975}
   spawn0x3: {fileID: 1198810977}
@@ -6832,8 +6833,8 @@ Transform:
   m_GameObject: {fileID: 1779422330}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 9.5, z: -43.5}
-  m_LocalScale: {x: 21.7, y: 1, z: 6.71747}
+  m_LocalPosition: {x: 0.94, y: 9.5, z: -43.5}
+  m_LocalScale: {x: 18.1, y: 1, z: 6.71747}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1164413597}
@@ -7428,8 +7429,8 @@ Transform:
   m_GameObject: {fileID: 1872798151}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: -43.5}
-  m_LocalScale: {x: 21.7, y: 1, z: 8.0325}
+  m_LocalPosition: {x: 0.94, y: -3, z: -43.5}
+  m_LocalScale: {x: 18.1, y: 1, z: 8.0325}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1164413597}

@@ -17,12 +17,8 @@ public class GameStats : MonoBehaviour
     public float timer;
     public bool timerActive;
 
-    public TextMeshProUGUI healthUI;
-    public TextMeshProUGUI timerUI;
-    public TextMeshProUGUI levelUI;
-    public TextMeshProUGUI chargeUI;
-    public TextMeshProUGUI pointsUI;
-    public TextMeshPro screenText;
+    //UI
+    public TextMeshProUGUI healthUI;public TextMeshProUGUI timerUI;public TextMeshProUGUI levelUI;public TextMeshProUGUI chargeUI;public TextMeshProUGUI pointsUI;public TextMeshPro screenText;
 
     public AudioClip startSound;
     public AudioClip loseSound;
@@ -32,16 +28,14 @@ public class GameStats : MonoBehaviour
     public GameObject player;
     private GameObject playerInstance;
 
-    public GameObject pixelguy1;
-    public GameObject pixelguy2;
-    public GameObject pixelguy3;
-    public GameObject pixelguy4;
-
-    public GameObject startCube;
-    private GameObject startCubeInstance;
-    public ParticleSystem cube_die;
-
-    public GameObject enemy_A;
+    //pixel guy animations
+    public GameObject pixelguy1;public GameObject pixelguy2;public GameObject pixelguy3;public GameObject pixelguy4;
+    
+    //Startcube
+    public GameObject startCube;private GameObject startCubeInstance;public ParticleSystem cube_die;
+    
+    //Enemies
+    public GameObject enemy_A; public GameObject enemy_Ab;
 
 
 
@@ -127,24 +121,29 @@ public class GameStats : MonoBehaviour
         if (level == 1)
         {
             Console.WriteLine($"LEVEL STARTED: {level}");
-            levelEnemies = 4;
-            Instantiate(enemy_A, spawn[1, 0].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[1, 6].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[1, 8].transform.position, transform.rotation);
+            levelEnemies = 6;
+            Instantiate(enemy_A, spawn[2, 0].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 8].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[3, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[3, 6].transform.position, transform.rotation);
 
         }
         else if (level == 2)
         {
             Console.WriteLine($"LEVEL STARTED: {level}");
-            levelEnemies = 7;
-            Instantiate(enemy_A, spawn[1, 0].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[1, 1].transform.position, transform.rotation);
+            levelEnemies = 9;
+            
             Instantiate(enemy_A, spawn[1, 3].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[1, 4].transform.position, transform.rotation);
-            Instantiate(enemy_A, spawn[2, 0].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 5].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 6].transform.position, transform.rotation);
             Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
             Instantiate(enemy_A, spawn[2, 4].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[4, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[4, 2].transform.position, transform.rotation);
         }
 
     }

@@ -1,35 +1,36 @@
 using UnityEngine;
-
-public class Enemy_A : MonoBehaviour
+public class Enemy_B : MonoBehaviour
 {
 
-    
     private GameStats gameStats;
+    private SpriteRenderer spriteRenderer;
     public GameObject projectile;
     public GameObject floatingPoints;
     public AudioClip death;
     public AudioClip shoot;
     public GameObject Explosion;
 
-    private int points = 50;
-    public float speed = 0.5f;
-    public float duration = 3f;
+    private int points = 75;//more points
+    public float speed = 1.5f; // faster than Enemy_A's 0.5f
+    public float duration = 1.5f; // shorter than Enemy_A's 3f = fires more often
+
     private float timeElapsed = 0f;
+
     private bool moveRight = true;
+
     public string explosionType = "EnemyA";
 
     void Start()
     {
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
-        timeElapsed +=duration/2;//head start to keep enemies centered
-        
+        timeElapsed += duration / 2; //head start to keep enemies centered
+
     }
     void Update() //idle movemets
     {
         if (gameStats.playerAlive) //stops all if player is dead
         {
             timeElapsed += Time.deltaTime;
-
             if (moveRight)
             {
                 transform.Translate(speed * Time.deltaTime, 0, 0);
@@ -38,7 +39,6 @@ public class Enemy_A : MonoBehaviour
             {
                 transform.Translate(-speed * Time.deltaTime, 0, 0);
             }
-
             if (timeElapsed >= duration)
             {
                 moveRight = !moveRight; // Swap direction
@@ -48,9 +48,6 @@ public class Enemy_A : MonoBehaviour
             }
         }
     }
-
-
-
     void OnTriggerEnter(Collider col)  //killed on hit
     {
         if (col.gameObject.tag == "Player Projectile")
@@ -58,28 +55,8 @@ public class Enemy_A : MonoBehaviour
             Instantiate(floatingPoints, transform.position, Quaternion.identity).GetComponent<FloatingPoints>().pointWorth = points; //spawn points graphic
             Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType; //spawn Explosion
             AudioSource.PlayClipAtPoint(death, transform.position, 1.0f);
-
             gameStats.EnemyDown(points);// pass points to gamestats
             Destroy(this.gameObject);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
