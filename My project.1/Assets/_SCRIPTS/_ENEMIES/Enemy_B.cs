@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class Enemy_B : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class Enemy_B : MonoBehaviour
     public AudioClip death;
     public AudioClip shoot;
     public GameObject Explosion;
+    public GameObject energySphere;
     public ParticleSystem LaserCharge;
     public ParticleSystem LaserFire;
     private Transform player;
@@ -25,11 +27,14 @@ public class Enemy_B : MonoBehaviour
         Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
         player = GameObject.FindWithTag("Player").transform;
+        energySphere.SetActive(false);
         timeElapsed += duration / 2;
     }
 
     void Update()
     {
+        LaserCharge.transform.Rotate(0,0,30*Time.deltaTime,Space.Self);
+
         if (!gameStats.playerAlive) return;
 
         timeElapsed += Time.deltaTime;
@@ -47,23 +52,48 @@ public class Enemy_B : MonoBehaviour
     {
         canFire = false;
         LaserCharge.Play();
-        yield return new WaitForSeconds(1.3f);
+        yield return StartCoroutine(ChargeUpEffect());
+       // yield return new WaitForSeconds(1.3f);
 
         Vector3 targetPosition = player.position; // snapshot taken once, before any shots
-
 
         LaserFire.Play();
 
         for (int i = 0; i < 5; i++)
         {
+
             AudioSource.PlayClipAtPoint(shoot, transform.position, 1.0f);
-            Instantiate(projectile, transform.position, transform.rotation).GetComponent<Projectile_B>().target = targetPosition;
+            Instantiate(projectile, transform.position + Vector3.down * 0.3f, transform.rotation).GetComponent<Projectile_B>().target = targetPosition;
 
             if (i < 4) yield return new WaitForSeconds(.1f);//seconds between shots
         }
 
         canFire = true;
     }
+
+    IEnumerator ChargeUpEffect()
+    {
+        Vector3 startScale = energySphere.transform.localScale;
+        Vector3 maxScale = startScale * 15f;
+        float chargeDuration = 2f;
+        float t = 0f;
+
+        energySphere.SetActive(true);
+
+        while (t < chargeDuration)
+        {
+            t += Time.deltaTime;
+            energySphere.transform.localScale = Vector3.Lerp(startScale, maxScale, t / chargeDuration);
+            yield return null;
+        }
+
+        energySphere.SetActive(false);
+        energySphere.transform.localScale = startScale;
+    }
+
+
+
+
 
     void OnTriggerEnter(Collider col)
     {

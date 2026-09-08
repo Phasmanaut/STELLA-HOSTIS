@@ -5,14 +5,13 @@ using Unity.Mathematics;
 using UnityEngine.UIElements;
 
 
+
 public class Projectile_B : MonoBehaviour
 {
-
     private float projSpeed = 7; //speed of the bullet
     public Vector3 target;
     void Start() //when the bullet is spawned point at player
     {
-
         transform.LookAt(target);
         transform.SetParent(null);
 
