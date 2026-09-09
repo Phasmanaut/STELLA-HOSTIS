@@ -8,9 +8,9 @@ using UnityEngine.UIElements;
 
 public class Projectile_B : MonoBehaviour
 {
-    private float projSpeed = 7; //speed of the bullet
+    private float projSpeed = 7;
     public Vector3 target;
-    void Start() //when the bullet is spawned point at player
+    void Start() //when the bullet is spawned point at target given
     {
         transform.LookAt(target);
         transform.SetParent(null);

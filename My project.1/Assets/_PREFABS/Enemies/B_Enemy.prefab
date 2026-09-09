@@ -327,6 +327,8 @@ MonoBehaviour:
   floatingPoints: {fileID: 7863017483065356163, guid: 49da3d981e108ef4b935a18a24bd0ba4, type: 3}
   death: {fileID: 8300000, guid: 53146ed43a13e654197a5c01fae1c24c, type: 3}
   shoot: {fileID: 8300000, guid: 73855975198cd88428208b18de08f114, type: 3}
+  shootCharge: {fileID: 8300000, guid: 6a49ebd93803af749a4060cc8fd6cce3, type: 3}
+  shootChargeFull: {fileID: 8300000, guid: 3e150cb259a5e924cad986c5334adf12, type: 3}
   Explosion: {fileID: 8310371246214944465, guid: ab54a4f2cd849d1499ddd25262ee25d5, type: 3}
   energySphere: {fileID: 9121373471890956615}
   LaserCharge: {fileID: 4305912922040523085}

@@ -5,26 +5,23 @@ using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 public class Player : MonoBehaviour
 {
+    public AudioClip hurt1; public AudioClip hurt2; public AudioClip hurt3;
+    public GameObject Explosion;
+    private GameStats gameStats;
+
     private float invincibilityTime = 0;
     public float invincibilityDuration = 0.3f;
     public float speed = 5f;//not a very good var name
     public float rotation = .05f;
     public string explosionType = "Player";
-    
 
-    public GameObject Explosion;
-    private GameStats gameStats;
-    
+    [Header("Flight Shake")]
+    public Transform shipModel;
+    public float shakeAmount = 0.03f;   // how far it wobbles
+    public float shakeSpeed = 8f;       // how fast the wobble cycles
+    private float shakeSeed;            // offsets noise per-axis so they don't sync up
 
-    public AudioClip hurt1;public AudioClip hurt2;public AudioClip hurt3;
-
-
-
-    void Start()
-    {
-        transform.position = new Vector3(0, 0.5f, 0);
-        gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();// gets the script from the object
-    }
+    [Header("Rotation and banking")]
     public float maxRotationAngle = 20f; // Max rotation in degrees
     public float rotationSpeed = 100f; // Rotation speed
     public float returnSpeed = 200f; // Speed to return to neutral
@@ -38,6 +35,18 @@ public class Player : MonoBehaviour
     public float bankSpeed = 100f; // How quickly it banks into a turn
     public float bankReturnSpeed = 150f; // How quickly it levels back out when stopping
     private float targetRotationZ = 0f; // Target roll around Z-axis (the bank)
+
+
+
+
+    void Start()
+    {
+        shakeSeed = UnityEngine.Random.Range(0f, 1000f);
+
+        transform.position = new Vector3(0, 0.5f, 0);
+        gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();// gets the script from the object
+    }
+
 
     void Update()
     {    // Check input keys
@@ -84,17 +93,30 @@ public class Player : MonoBehaviour
             pos.y -= (speed * .75f) * Time.deltaTime;
         }
 
-
-
-
-
         pos.x += currentSpeed * Time.deltaTime;
 
         // Apply rotation (yaw + bank) & movement to the player
         Quaternion targetRotation = Quaternion.Euler(0f, targetRotationY, targetRotationZ);
         transform.rotation = targetRotation;
         transform.position = pos;
+
+        ApplyFlightShake();
     }
+
+    void ApplyFlightShake()
+    {
+        float t = Time.time * shakeSpeed;
+        float x = (Mathf.PerlinNoise(t, shakeSeed) - 0.5f) * 2f * shakeAmount;
+        float y = (Mathf.PerlinNoise(t, shakeSeed + 100f) - 0.5f) * 2f * shakeAmount;
+        float z = (Mathf.PerlinNoise(t, shakeSeed + 200f) - 0.5f) * 2f * shakeAmount * 0.5f;
+
+        if (shipModel != null)
+        {
+            shipModel.localPosition = new Vector3(x, y, z);
+        }
+    }
+
+
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.CompareTag("EnemyProjectile") && invincibilityTime <= 0)

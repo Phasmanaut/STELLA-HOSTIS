@@ -126,12 +126,12 @@ public class GameStats : MonoBehaviour
             Console.WriteLine($"LEVEL STARTED: {level}");
             levelEnemies = 6;
             Instantiate(enemy_A, spawn[2, 0].transform.position, transform.rotation);
-            //Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
-            //Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
-            //Instantiate(enemy_A, spawn[2, 8].transform.position, transform.rotation);
-            //Instantiate(enemy_A, spawn[3, 2].transform.position, transform.rotation);
-            //Instantiate(enemy_A, spawn[3, 6].transform.position, transform.rotation);
-            Instantiate(enemy_B, spawn[3, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[2, 8].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[3, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[3, 6].transform.position, transform.rotation);
+            
 
         }
         else if (level == 2)
@@ -148,6 +148,62 @@ public class GameStats : MonoBehaviour
             Instantiate(enemy_A, spawn[2, 6].transform.position, transform.rotation);
             Instantiate(enemy_Ab, spawn[4, 6].transform.position, transform.rotation);
             Instantiate(enemy_Ab, spawn[4, 2].transform.position, transform.rotation);
+        }
+        else if (level == 3)
+        {
+            Console.WriteLine($"LEVEL STARTED: {level}");
+            levelEnemies = 9;
+
+            Instantiate(enemy_A, spawn[1, 3].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 5].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 2].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 4].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[3, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[3, 2].transform.position, transform.rotation);
+        }
+        else if (level == 4)
+        {
+            Console.WriteLine($"LEVEL STARTED: {level}");
+            levelEnemies = 9;
+
+            Instantiate(enemy_B, spawn[1, 0].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
+            Instantiate(enemy_B, spawn[1, 8].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[1, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 2].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 4].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[4, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[4, 2].transform.position, transform.rotation);
+        }
+        else if (level == 5)
+        {
+            Console.WriteLine($"LEVEL STARTED: {level}");
+            levelEnemies = 20;
+
+            Instantiate(enemy_B, spawn[1, 0].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[1, 2].transform.position, transform.rotation);
+            Instantiate(enemy_B, spawn[1, 8].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[1, 6].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 2].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 4].transform.position, transform.rotation);
+            Instantiate(enemy_Ab, spawn[2, 6].transform.position, transform.rotation);
+            Instantiate(enemy_B, spawn[4, 0].transform.position, transform.rotation);
+            Instantiate(enemy_B, spawn[4, 8].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[4, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[4, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 0].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 1].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 2].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 3].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 4].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 5].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 6].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 7].transform.position, transform.rotation);
+            Instantiate(enemy_A, spawn[5, 8].transform.position, transform.rotation);
         }
 
     }

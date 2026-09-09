@@ -9,6 +9,8 @@ public class Enemy_B : MonoBehaviour
     public GameObject floatingPoints;
     public AudioClip death;
     public AudioClip shoot;
+    public AudioClip shootCharge;
+    public AudioClip shootChargeFull;
     public GameObject Explosion;
     public GameObject energySphere;
     public ParticleSystem LaserCharge;
@@ -52,10 +54,10 @@ public class Enemy_B : MonoBehaviour
     {
         canFire = false;
         LaserCharge.Play();
-        yield return StartCoroutine(ChargeUpEffect());
+        yield return StartCoroutine(ChargeUpSphere());
        // yield return new WaitForSeconds(1.3f);
 
-        Vector3 targetPosition = player.position; // snapshot taken once, before any shots
+        Vector3 targetPosition = player.position; // snapshot taken once, before any shots for one stream
 
         LaserFire.Play();
 
@@ -71,8 +73,9 @@ public class Enemy_B : MonoBehaviour
         canFire = true;
     }
 
-    IEnumerator ChargeUpEffect()
+    IEnumerator ChargeUpSphere()
     {
+        AudioSource.PlayClipAtPoint(shootCharge,transform.position, 100.0f);
         Vector3 startScale = energySphere.transform.localScale;
         Vector3 maxScale = startScale * 15f;
         float chargeDuration = 2f;
@@ -86,7 +89,7 @@ public class Enemy_B : MonoBehaviour
             energySphere.transform.localScale = Vector3.Lerp(startScale, maxScale, t / chargeDuration);
             yield return null;
         }
-
+        AudioSource.PlayClipAtPoint(shootChargeFull, transform.position, 1.0f);
         energySphere.SetActive(false);
         energySphere.transform.localScale = startScale;
     }

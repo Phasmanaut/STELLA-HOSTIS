@@ -29,6 +29,16 @@ public class Explosion_Effect : MonoBehaviour
             ShrapnelA.Play();
             Fire.Play();
         }
+        if (explosionType.ToLower() == "enemyab")
+        {
+            ShrapnelA.Play();
+            Fire.Play();
+        }
+        if (explosionType.ToLower() == "enemyb")
+        {
+            ShrapnelA.Play();
+            Fire.Play();
+        }
     }
 
     void Update()

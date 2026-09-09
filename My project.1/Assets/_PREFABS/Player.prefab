@@ -36,8 +36,6 @@ Transform:
   - {fileID: 4506709622608266618}
   - {fileID: 5117725580742488795}
   - {fileID: 5150700396669224258}
-  - {fileID: 8567137251291206269}
-  - {fileID: 5717098030504964772}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &4950277269560523764
@@ -116,16 +114,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abe46d159043b974f82b1eb4e14da2bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hurt1: {fileID: 8300000, guid: fe91a1d244c7f8641a8b611b2529ad20, type: 3}
+  hurt2: {fileID: 8300000, guid: d3f22b8e125479b40a010e584790f48c, type: 3}
+  hurt3: {fileID: 8300000, guid: 341cc04fcbe470b4983d812f3f2b1052, type: 3}
+  Explosion: {fileID: 8310371246214944465, guid: ab54a4f2cd849d1499ddd25262ee25d5, type: 3}
   invincibilityDuration: 0.3
   speed: 4
   rotation: 0.7
   explosionType: player
-  Explosion: {fileID: 8310371246214944465, guid: ab54a4f2cd849d1499ddd25262ee25d5, type: 3}
-  hurt1: {fileID: 8300000, guid: fe91a1d244c7f8641a8b611b2529ad20, type: 3}
-  hurt2: {fileID: 8300000, guid: d3f22b8e125479b40a010e584790f48c, type: 3}
-  hurt3: {fileID: 8300000, guid: 341cc04fcbe470b4983d812f3f2b1052, type: 3}
+  shipModel: {fileID: 5150700396669224258}
+  shakeAmount: 0.01
+  shakeSpeed: 8
   maxRotationAngle: 20
-  rotationSpeed: 50
+  rotationSpeed: 60
   returnSpeed: 100
   acceleration: 40
   deceleration: 20
@@ -158,12 +159,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3070120437648591781}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0.602, z: 0}
-  m_LocalScale: {x: 0.13400719, y: 0.13400719, z: 0.13400719}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
+  m_LocalPosition: {x: 0, y: 0.1299, z: 0}
+  m_LocalScale: {x: 0.13979898, y: 0.139799, z: 0.139799}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1239483387253753644}
+  m_Father: {fileID: 5150700396669224258}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!198 &2206466108188953342
 ParticleSystem:
@@ -4991,12 +4992,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5411426516736719409}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.003, y: -0.514, z: 0}
-  m_LocalScale: {x: 0.09491997, y: 0.09491997, z: 0.09491997}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
+  m_LocalPosition: {x: 0, y: 0.1038, z: 0}
+  m_LocalScale: {x: 0.099022426, y: 0.099022426, z: 0.099022426}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1239483387253753644}
+  m_Father: {fileID: 5150700396669224258}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!198 &4950389611066393226
 ParticleSystem:
@@ -14872,7 +14873,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 34bee0c2c38cee147881cd0c60089de5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8567137251291206269}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 34bee0c2c38cee147881cd0c60089de5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5717098030504964772}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 34bee0c2c38cee147881cd0c60089de5, type: 3}
 --- !u!4 &5150700396669224258 stripped

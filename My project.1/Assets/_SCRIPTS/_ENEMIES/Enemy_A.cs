@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class Enemy_A : MonoBehaviour
 {
-
-    
     private GameStats gameStats;
     public GameObject projectile;
     public GameObject floatingPoints;
@@ -18,18 +16,27 @@ public class Enemy_A : MonoBehaviour
     private bool moveRight = true;
     public string explosionType = "EnemyA";
 
+    [Header("Firing")]
+    public float minFireInterval = 1.5f; // shortest possible time between shots
+    public float maxFireInterval = 4f;   // longest possible time between shots
+    private float fireTimer = 0f;
+    private float nextFireTime;
+
     void Start()
     {
-        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType; //spawn Explosion
+        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
-        timeElapsed +=duration/2;//head start to keep enemies centered
-        
+        timeElapsed += duration / 2;
+
+        nextFireTime = Random.Range(minFireInterval, maxFireInterval);
     }
-    void Update() //idle movemets
+
+    void Update()
     {
-        if (gameStats.playerAlive) //stops all if player is dead
+        if (gameStats.playerAlive)
         {
             timeElapsed += Time.deltaTime;
+            fireTimer += Time.deltaTime;
 
             if (moveRight)
             {
@@ -42,45 +49,30 @@ public class Enemy_A : MonoBehaviour
 
             if (timeElapsed >= duration)
             {
-                moveRight = !moveRight; // Swap direction
-                timeElapsed = 0f; // Reset timer     
+                moveRight = !moveRight;
+                timeElapsed = 0f;
+            }
+
+            if (fireTimer >= nextFireTime)
+            {
+                fireTimer = 0f;
+                nextFireTime = Random.Range(minFireInterval, maxFireInterval); // rolls a new random interval
                 Instantiate(projectile, this.transform);
                 AudioSource.PlayClipAtPoint(shoot, transform.position, 1.0f);
             }
         }
     }
 
-
-
-    void OnTriggerEnter(Collider col)  //killed on hit
+    void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.tag == "Player Projectile")
         {
-            Instantiate(floatingPoints, transform.position, Quaternion.identity).GetComponent<FloatingPoints>().pointWorth = points; //spawn points graphic
-            Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType; //spawn Explosion
+            Instantiate(floatingPoints, transform.position, Quaternion.identity).GetComponent<FloatingPoints>().pointWorth = points;
+            Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
             AudioSource.PlayClipAtPoint(death, transform.position, 1.0f);
 
-            gameStats.EnemyDown(points);// pass points to gamestats
+            gameStats.EnemyDown(points);
             Destroy(this.gameObject);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
