@@ -3,6 +3,8 @@ using UnityEngine;
 public class Explosion_Effect : MonoBehaviour
 {
     public ParticleSystem ShrapnelA;
+    public ParticleSystem ShrapnelAb;
+    public ParticleSystem ShrapnelB;
     public ParticleSystem Fire;
     public ParticleSystem ShrapnelPlayer;
     private float timer = 0;
@@ -11,6 +13,8 @@ public class Explosion_Effect : MonoBehaviour
     void Start()
     {
         ShrapnelA = transform.Find("ShrapnelA").GetComponent<ParticleSystem>();
+        ShrapnelAb = transform.Find("ShrapnelAb").GetComponent<ParticleSystem>();
+        ShrapnelB = transform.Find("ShrapnelB").GetComponent<ParticleSystem>();
         Fire = transform.Find("Fire").GetComponent<ParticleSystem>();
         ShrapnelPlayer = transform.Find("ShrapnelPlayer").GetComponent<ParticleSystem>();
 
@@ -31,12 +35,12 @@ public class Explosion_Effect : MonoBehaviour
         }
         if (explosionType.ToLower() == "enemyab")
         {
-            ShrapnelA.Play();
+            ShrapnelAb.Play();
             Fire.Play();
         }
         if (explosionType.ToLower() == "enemyb")
         {
-            ShrapnelA.Play();
+            ShrapnelB.Play();
             Fire.Play();
         }
     }

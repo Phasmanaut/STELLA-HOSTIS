@@ -13,11 +13,15 @@ public class GameStats : MonoBehaviour
     public int level;
     public int levelEnemies;
     public int points;
+    public int goo;
     public float timer;
     public bool timerActive;
 
     //UI
     public TextMeshProUGUI healthUI; public TextMeshProUGUI timerUI; public TextMeshProUGUI levelUI; public TextMeshProUGUI chargeUI; public TextMeshProUGUI pointsUI; public TextMeshPro screenText;
+
+    //Goo meter
+    public int maxGoo = 50;
 
     public AudioClip startSound;
     public AudioClip loseSound;
@@ -69,6 +73,7 @@ public class GameStats : MonoBehaviour
         playerCharge = 0;
         level = 0;
         points = 0;
+        goo = 0;
         screenText.text = $"SHOOT THE CUBE TO START!";
 
         playerInstance = Instantiate(player);//instantiates the pref and assigns it so just the instance can be destroyed
@@ -216,6 +221,11 @@ public class GameStats : MonoBehaviour
         {
             LevelEnd();
         }
+    }
+
+    public void CollectGoo(int amount)
+    {
+        goo += amount;
     }
 
     //Between-level transition: counts down instead of spawning a cube to shoot

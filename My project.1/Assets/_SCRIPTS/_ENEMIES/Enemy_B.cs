@@ -11,6 +11,7 @@ public class Enemy_B : MonoBehaviour
     public AudioClip shootCharge;
     public AudioClip shootChargeFull;
     public GameObject Explosion;
+    public GameObject gooPrefab;
     public GameObject energySphere;
     public ParticleSystem LaserCharge;
     public ParticleSystem LaserFire;
@@ -23,17 +24,43 @@ public class Enemy_B : MonoBehaviour
     public string explosionType = "EnemyB";
     private bool canFire = true;
 
+    [Header("Entrance")]
+    public float entryHeight = 6f; // how far above its spawn slot it flies in from
+    public float entryAngleFactor = 0.6f; // sideways offset per unit of the slot's x, so it glides in at an angle
+    public float baseEntryDuration = 1f; // how long the fly-in takes
+    public float entryDurationPerY = 0.08f; // longer for higher spawn slots, shorter for lower ones
+    public float entryDurationVariance = 0.15f; // random +/- duration so the formation doesn't fly in perfectly uniform
+    private Vector3 spawnPosition;
+    private Vector3 entryStartPosition;
+    private float entryDuration;
+    private float entryElapsed = 0f;
+    private bool isEntering = true;
+
     void Start()
     {
-        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
         player = GameObject.FindWithTag("Player").transform;
         energySphere.SetActive(false);
         timeElapsed += duration / 2;
+
+        spawnPosition = transform.position;
+        entryStartPosition = spawnPosition + Vector3.up * entryHeight + Vector3.right * (spawnPosition.x * entryAngleFactor);
+        transform.position = entryStartPosition;
+        entryDuration = Mathf.Max(0.2f, baseEntryDuration + entryDurationPerY * spawnPosition.y + Random.Range(-entryDurationVariance, entryDurationVariance));
     }
 
     void Update()
     {
+        if (isEntering)
+        {
+            entryElapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(entryElapsed / entryDuration);
+            float eased = t * t * (3f - 2f * t); // smoothstep: eases in, then decelerates into a smooth landing
+            transform.position = Vector3.Lerp(entryStartPosition, spawnPosition, eased);
+            if (t >= 1f) isEntering = false;
+            return;
+        }
+
         LaserCharge.transform.Rotate(0,0,30*Time.deltaTime,Space.Self);
 
         if (!gameStats.playerAlive) return;
@@ -55,6 +82,12 @@ public class Enemy_B : MonoBehaviour
         LaserCharge.Play();
         yield return StartCoroutine(ChargeUpSphere());
        // yield return new WaitForSeconds(1.3f);
+
+        if (player == null) // the player object is destroyed on death, so cancel the shot instead of firing at nothing
+        {
+            canFire = true;
+            yield break;
+        }
 
         Vector3 targetPosition = player.position; // snapshot taken once, before any shots for one stream
 
@@ -105,6 +138,7 @@ public class Enemy_B : MonoBehaviour
             Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
             AudioSource.PlayClipAtPoint(death, transform.position, 1.0f);
             gameStats.EnemyDown(points);
+            GooSpawner.SpawnGoo(gooPrefab, transform.position, points);
             Destroy(this.gameObject);
         }
     }

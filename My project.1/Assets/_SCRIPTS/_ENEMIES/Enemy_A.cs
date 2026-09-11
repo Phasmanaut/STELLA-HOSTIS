@@ -8,6 +8,7 @@ public class Enemy_A : MonoBehaviour
     public AudioClip death;
     public AudioClip shoot;
     public GameObject Explosion;
+    public GameObject gooPrefab;
 
     private int points = 50;
     private float speed = 0.5f;
@@ -22,17 +23,43 @@ public class Enemy_A : MonoBehaviour
     private float fireTimer = 0f;
     private float nextFireTime;
 
+    [Header("Entrance")]
+    public float entryHeight = 6f; // how far above its spawn slot it flies in from
+    public float entryAngleFactor = 0.6f; // sideways offset per unit of the slot's x, so it glides in at an angle
+    public float baseEntryDuration = 1f; // how long the fly-in takes
+    public float entryDurationPerY = 0.08f; // longer for higher spawn slots, shorter for lower ones
+    public float entryDurationVariance = 0.15f; // random +/- duration so the formation doesn't fly in perfectly uniform
+    private Vector3 spawnPosition;
+    private Vector3 entryStartPosition;
+    private float entryDuration;
+    private float entryElapsed = 0f;
+    private bool isEntering = true;
+
     void Start()
     {
-        Instantiate(Explosion, transform.position, Quaternion.identity).GetComponent<Explosion_Effect>().explosionType = explosionType;
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
         timeElapsed += duration / 2;
 
         nextFireTime = Random.Range(minFireInterval, maxFireInterval);
+
+        spawnPosition = transform.position;
+        entryStartPosition = spawnPosition + Vector3.up * entryHeight + Vector3.right * (spawnPosition.x * entryAngleFactor);
+        transform.position = entryStartPosition;
+        entryDuration = Mathf.Max(0.2f, baseEntryDuration + entryDurationPerY * spawnPosition.y + Random.Range(-entryDurationVariance, entryDurationVariance));
     }
 
     void Update()
     {
+        if (isEntering)
+        {
+            entryElapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(entryElapsed / entryDuration);
+            float eased = t * t * (3f - 2f * t); // smoothstep: eases in, then decelerates into a smooth landing
+            transform.position = Vector3.Lerp(entryStartPosition, spawnPosition, eased);
+            if (t >= 1f) isEntering = false;
+            return;
+        }
+
         if (gameStats.playerAlive)
         {
             timeElapsed += Time.deltaTime;
@@ -72,6 +99,7 @@ public class Enemy_A : MonoBehaviour
             AudioSource.PlayClipAtPoint(death, transform.position, 1.0f);
 
             gameStats.EnemyDown(points);
+            GooSpawner.SpawnGoo(gooPrefab, transform.position, points);
             Destroy(this.gameObject);
         }
     }

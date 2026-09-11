@@ -330,10 +330,16 @@ MonoBehaviour:
   shootCharge: {fileID: 8300000, guid: 6a49ebd93803af749a4060cc8fd6cce3, type: 3}
   shootChargeFull: {fileID: 8300000, guid: 3e150cb259a5e924cad986c5334adf12, type: 3}
   Explosion: {fileID: 8310371246214944465, guid: ab54a4f2cd849d1499ddd25262ee25d5, type: 3}
+  gooPrefab: {fileID: 100000001, guid: 5a7c9e1f3b5d7f9a1c3e5f7a9b1d3f5a, type: 3}
   energySphere: {fileID: 9121373471890956615}
   LaserCharge: {fileID: 4305912922040523085}
   LaserFire: {fileID: 5794779344373258619}
-  explosionType: EnemyA
+  explosionType: EnemyB
+  entryHeight: 6
+  entryAngleFactor: 0.6
+  baseEntryDuration: 1
+  entryDurationPerY: 0.08
+  entryDurationVariance: 0.15
 --- !u!1 &6883265101150167825
 GameObject:
   m_ObjectHideFlags: 0

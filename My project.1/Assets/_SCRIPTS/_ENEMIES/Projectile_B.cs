@@ -3,7 +3,7 @@ using UnityEngine;
 public class Projectile_B : MonoBehaviour
 {
     private float projSpeed = 7;
-    private float spinSpeed = 180f;
+    private float spinSpeed = 360f;
     public Vector3 target;
     void Start() //when the bullet is spawned point at target given
     {
