@@ -10,7 +10,7 @@ public class Enemy_Ab : MonoBehaviour
 
     private float timeElapsed = 0f;
     private bool moveRight = true;
-    public string explosionType = "EnemyA";
+    public string explosionType = "EnemyAb";
 
     void Start()
     {

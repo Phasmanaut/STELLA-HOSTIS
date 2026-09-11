@@ -1,9 +1,4 @@
 using UnityEngine;
-using System;
-using JetBrains.Annotations;
-using Unity.Mathematics;
-using UnityEngine.UIElements;
-
 
 public class Projectile_A : MonoBehaviour
 {

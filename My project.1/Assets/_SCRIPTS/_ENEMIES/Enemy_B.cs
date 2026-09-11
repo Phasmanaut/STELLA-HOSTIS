@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 public class Enemy_B : MonoBehaviour
 {
@@ -21,7 +20,7 @@ public class Enemy_B : MonoBehaviour
     private float duration = 2f;
     private float timeElapsed = 0f;
     private bool moveRight = true;
-    public string explosionType = "EnemyA";
+    public string explosionType = "EnemyB";
     private bool canFire = true;
 
     void Start()
@@ -75,7 +74,7 @@ public class Enemy_B : MonoBehaviour
 
     IEnumerator ChargeUpSphere()
     {
-        AudioSource.PlayClipAtPoint(shootCharge,transform.position, 100.0f);
+        AudioSource.PlayClipAtPoint(shootCharge,transform.position, 1.0f);
         Vector3 startScale = energySphere.transform.localScale;
         Vector3 maxScale = startScale * 15f;
         float chargeDuration = 2f;

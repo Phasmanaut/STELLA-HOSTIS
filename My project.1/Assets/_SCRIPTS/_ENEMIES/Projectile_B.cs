@@ -1,14 +1,9 @@
 using UnityEngine;
-using System;
-using JetBrains.Annotations;
-using Unity.Mathematics;
-using UnityEngine.UIElements;
-
-
 
 public class Projectile_B : MonoBehaviour
 {
     private float projSpeed = 7;
+    private float spinSpeed = 180f;
     public Vector3 target;
     void Start() //when the bullet is spawned point at target given
     {
@@ -20,7 +15,7 @@ public class Projectile_B : MonoBehaviour
     {
 
         transform.Translate(transform.forward * projSpeed * Time.deltaTime, Space.World);
-        transform.Rotate(transform.forward, Space.World);
+        transform.Rotate(Vector3.forward, spinSpeed * Time.deltaTime, Space.Self);
     }
     private void OnCollisionEnter(Collision col)
     {
