@@ -11,10 +11,10 @@ public class CameraTilt : MonoBehaviour
 
     void Update()
     {
-        bool right = Input.GetKey(KeyCode.D);
-        bool left = Input.GetKey(KeyCode.A);
-        bool up = Input.GetKey(KeyCode.W);
-        bool down = Input.GetKey(KeyCode.S);
+        bool right = GameInput.Right;
+        bool left = GameInput.Left;
+        bool up = GameInput.Up;
+        bool down = GameInput.Down;
 
         float targetRoll = 0f;
         if (right && !left) targetRoll = -rollAmount;

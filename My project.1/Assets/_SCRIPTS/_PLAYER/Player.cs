@@ -48,11 +48,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {    // Check input keys
-        bool right = Input.GetKey(KeyCode.D);
-        bool left = Input.GetKey(KeyCode.A);
+        bool right = GameInput.Right;
+        bool left = GameInput.Left;
 
-        bool up = Input.GetKey(KeyCode.W);
-        bool down = Input.GetKey(KeyCode.S);
+        bool up = GameInput.Up;
+        bool down = GameInput.Down;
 
         Vector3 pos = transform.position;
 

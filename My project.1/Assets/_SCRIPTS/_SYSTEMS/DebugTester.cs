@@ -12,15 +12,17 @@ public class DebugTester : MonoBehaviour
 
     private const string Controls =
         "DEV MODE ACTIVATED\n" +
-        "1-5: Jump to level\n" +
+        "1-9, 0: Jump to level 1-10\n" +
         "F1-F5: Spawn Enemy A/Ab/B/C/D";
 
     private GameStats gameStats;
+    private EnemySpawner enemySpawner;
     private bool isActive = false;
 
     void Start()
     {
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
+        enemySpawner = FindFirstObjectByType<EnemySpawner>();
     }
 
     void Update()
@@ -37,18 +39,24 @@ public class DebugTester : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) StartLevel(3);
         if (Input.GetKeyDown(KeyCode.Alpha4)) StartLevel(4);
         if (Input.GetKeyDown(KeyCode.Alpha5)) StartLevel(5);
+        if (Input.GetKeyDown(KeyCode.Alpha6)) StartLevel(6);
+        if (Input.GetKeyDown(KeyCode.Alpha7)) StartLevel(7);
+        if (Input.GetKeyDown(KeyCode.Alpha8)) StartLevel(8);
+        if (Input.GetKeyDown(KeyCode.Alpha9)) StartLevel(9);
+        if (Input.GetKeyDown(KeyCode.Alpha0)) StartLevel(10); // 0 only activates dev mode while it's off, so it's free for level 10 here
 
         // F keys: spawn a single enemy type in isolation
-        if (Input.GetKeyDown(KeyCode.F1)) SpawnEnemy(gameStats.enemy_A, "Enemy A");
-        if (Input.GetKeyDown(KeyCode.F2)) SpawnEnemy(gameStats.enemy_Ab, "Enemy Ab");
-        if (Input.GetKeyDown(KeyCode.F3)) SpawnEnemy(gameStats.enemy_B, "Enemy B");
-        if (Input.GetKeyDown(KeyCode.F4)) SpawnEnemy(gameStats.enemy_C, "Enemy C");
-        if (Input.GetKeyDown(KeyCode.F5)) SpawnEnemy(gameStats.enemy_D, "Enemy D");
+        if (Input.GetKeyDown(KeyCode.F1)) SpawnEnemy(enemySpawner.enemy_A, "Enemy A");
+        if (Input.GetKeyDown(KeyCode.F2)) SpawnEnemy(enemySpawner.enemy_Ab, "Enemy Ab");
+        if (Input.GetKeyDown(KeyCode.F3)) SpawnEnemy(enemySpawner.enemy_B, "Enemy B");
+        if (Input.GetKeyDown(KeyCode.F4)) SpawnEnemy(enemySpawner.enemy_C, "Enemy C");
+        if (Input.GetKeyDown(KeyCode.F5)) SpawnEnemy(enemySpawner.enemy_D, "Enemy D");
     }
 
     void Activate()
     {
         isActive = true;
+        gameStats.devModeUsed = true; // keeps test runs off the website's highscore list
 
         StartButton startButton = FindFirstObjectByType<StartButton>();
         if (startButton != null) startButton.gameObject.SetActive(false);
@@ -70,7 +78,7 @@ public class DebugTester : MonoBehaviour
     {
         if (enemyPrefab == null)
         {
-            Debug.LogWarning($"[DebugTester] {label} has no prefab assigned on GameStats.");
+            Debug.LogWarning($"[DebugTester] {label} has no prefab assigned on EnemySpawner.");
             return;
         }
 

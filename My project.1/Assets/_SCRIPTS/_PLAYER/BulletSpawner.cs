@@ -6,7 +6,6 @@ public class BulletSpawner : MonoBehaviour
     public GameObject bullet;
     public GameObject player;
     Boolean canFire = true;
-    float inputSpace;
     public float cooldown =1f;
     
     public AudioSource sound_fire;
@@ -23,8 +22,7 @@ public class BulletSpawner : MonoBehaviour
     {
         if (canFire)
         {
-            inputSpace = Input.GetAxis("Fire1");
-            if (inputSpace > 0)
+            if (GameInput.Fire) //space, left mouse, or the on-screen fire button
             {
                 Instantiate(bullet, transform.position, transform.rotation);
                 sound_fire.Play();

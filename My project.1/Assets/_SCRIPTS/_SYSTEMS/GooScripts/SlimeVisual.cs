@@ -56,10 +56,10 @@ public class SlimeVisual : MonoBehaviour
         surfacePos.y = surfaceBaseY + fullHeight * fillT;
         surface.localPosition = surfacePos;
 
-        bool right = Input.GetKey(KeyCode.D);
-        bool left = Input.GetKey(KeyCode.A);
-        bool up = Input.GetKey(KeyCode.W);
-        bool down = Input.GetKey(KeyCode.S);
+        bool right = GameInput.Right;
+        bool left = GameInput.Left;
+        bool up = GameInput.Up;
+        bool down = GameInput.Down;
 
         float targetTiltZ = 0f;
         if (right && !left) targetTiltZ = -tiltAmount; // slosh lags opposite the turn, like inertia

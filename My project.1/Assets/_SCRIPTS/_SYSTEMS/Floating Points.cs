@@ -9,10 +9,11 @@ public class FloatingPoints : MonoBehaviour
 {
     public TextMeshPro floatingPointsText;
     public int pointWorth;
+    public string message; //if set, shown instead of the points (e.g. "EXTRA LIFE!")
     private float timer;
     private void Start()
     {
-        floatingPointsText.text = $"+{pointWorth} ";
+        floatingPointsText.text = string.IsNullOrEmpty(message) ? $"+{pointWorth} " : message;
     }
 
 
