@@ -12,12 +12,10 @@ GameObject:
   - component: {fileID: 7404226438851801731}
   - component: {fileID: 3609158008560943964}
   - component: {fileID: 4639449351904187711}
-  - component: {fileID: 5606089156279188580}
-  - component: {fileID: 8544363042984365226}
   - component: {fileID: 4813145330893651340}
   - component: {fileID: 1090426488267398671}
   - component: {fileID: 134849790732032513}
-  - component: {fileID: 1366754933362474665}
+  - component: {fileID: -6103927741558230944}
   m_Layer: 7
   m_Name: D_Enemy
   m_TagString: Enemy
@@ -116,45 +114,12 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: -0.03, y: 0.1, z: 0}
---- !u!114 &5606089156279188580
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146612020378829864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e741851cba3ad425c91ecf922cc6b379, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"declarations":{"Kind":"Object","collection":{"$content":[{"name":"Move","value":{"$content":false,"$type":"System.Boolean"},"typeHandle":{"Identification":"System.Boolean,
-      mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","$version":"A"},"$version":"A"},{"name":"SoundHit","value":{"$content":0,"$type":"UnityEngine.Object"},"typeHandle":{"Identification":"UnityEngine.AudioClip,
-      UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$version":"A"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
-    _objectReferences:
-    - {fileID: 8300000, guid: 3e150cb259a5e924cad986c5334adf12, type: 3}
---- !u!114 &8544363042984365226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146612020378829864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2fe5546f775c47d2820aa5e8a715f53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _data:
-    _json: '{"nest":{"source":"Macro","macro":null,"embed":null}}'
-    _objectReferences: []
 --- !u!54 &4813145330893651340
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -178,7 +143,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 124
   m_CollisionDetection: 0
@@ -301,18 +266,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1366754933362474665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6146612020378829864}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df96669965cb4d29a0176903c854365a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1177650528230350308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -873,3 +826,44 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ff36dde994a5c6346a7d3d7f2ca37d11, type: 3}
   m_PrefabInstance: {fileID: 9075222193818258098}
   m_PrefabAsset: {fileID: 0}
+
+--- !u!114 &-6103927741558230944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6146612020378829864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da1d6e75a426428e9874c761c98cb3e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectile: {fileID: 2479554322019089208, guid: d1ba4b02a33bf7344ac3280213f7228f, type: 3}
+  floatingPoints: {fileID: 7863017483065356163, guid: 49da3d981e108ef4b935a18a24bd0ba4, type: 3}
+  death: {fileID: 8300000, guid: 53146ed43a13e654197a5c01fae1c24c, type: 3}
+  shoot: {fileID: 8300000, guid: 46a2d8e03010d5e49bdcba5b9f0aeb47, type: 3}
+  hit: {fileID: 8300000, guid: 3e150cb259a5e924cad986c5334adf12, type: 3}
+  Explosion: {fileID: 8310371246214944465, guid: ab54a4f2cd849d1499ddd25262ee25d5, type: 3}
+  gooPrefab: {fileID: 100000001, guid: 5a7c9e1f3b5d7f9a1c3e5f7a9b1d3f5a, type: 3}
+  explosionType: EnemyAb
+  health: 2
+  speed: 3
+  enragedSpeedMultiplier: 1.8
+  edgePause: 0.15
+  looseRoamWidth: 4
+  shakeAmount: 0.02
+  enragedShakeAmount: 0.09
+  shakeSpeed: 14
+  enragedShakeSpeed: 26
+  burstCount: 4
+  burstInterval: 0.07
+  burstProjectileSpeed: 14
+  burstSpread: 18
+  minFireInterval: 2.5
+  maxFireInterval: 4.5
+  entryHeight: 6
+  entryAngleFactor: 0.6
+  baseEntryDuration: 1
+  entryDurationPerY: 0.08
+  entryDurationVariance: 0.15

@@ -19,13 +19,26 @@ public class EnemySpawner : MonoBehaviour
                       spawn5x1, spawn5x2, spawn5x3, spawn5x4, spawn5x5, spawn5x6, spawn5x7, spawn5x8, spawn5x9,
                       spawn6x1, spawn6x2, spawn6x3, spawn6x4, spawn6x5, spawn6x6, spawn6x7, spawn6x8, spawn6x9;
 
-    public GameObject[,] spawn = new GameObject[7, 9];
+    public const int Rows = 7;
+    public const int Columns = 9;
+    public const int FirstEnemyRow = 1; //row 0 is the item row, so enemies never use it
+
+    public GameObject[,] spawn = new GameObject[Rows, Columns];
 
     private int spawnedCount; //how many enemies the current level has spawned so far
+
+    //Who is sitting in each grid slot. Destroyed enemies read back as null on their own, so a slot
+    //frees itself up as soon as its occupant dies - Enemy_C and Enemy_D use this to find room to move into.
+    private readonly GameObject[,] occupant = new GameObject[Rows, Columns];
+
+    //The one spawner in the scene, so enemies can ask about slots without hunting for it every time
+    public static EnemySpawner Instance { get; private set; }
 
     //Awake runs before any Start, so the grid is ready before GameStats (or DebugTester) can start a level
     void Awake()
     {
+        Instance = this;
+
         spawn[0, 0] = spawn0x1; spawn[0, 1] = spawn0x2; spawn[0, 2] = spawn0x3; spawn[0, 3] = spawn0x4; spawn[0, 4] = spawn0x5;
         spawn[1, 0] = spawn1x1; spawn[1, 1] = spawn1x2; spawn[1, 2] = spawn1x3; spawn[1, 3] = spawn1x4; spawn[1, 4] = spawn1x5; spawn[1, 5] = spawn1x6; spawn[1, 6] = spawn1x7; spawn[1, 7] = spawn1x8; spawn[1, 8] = spawn1x9;
         spawn[2, 0] = spawn2x1; spawn[2, 1] = spawn2x2; spawn[2, 2] = spawn2x3; spawn[2, 3] = spawn2x4; spawn[2, 4] = spawn2x5; spawn[2, 5] = spawn2x6; spawn[2, 6] = spawn2x7; spawn[2, 7] = spawn2x8; spawn[2, 8] = spawn2x9;
@@ -45,6 +58,7 @@ public class EnemySpawner : MonoBehaviour
     public int SpawnLevel(int level)
     {
         spawnedCount = 0;
+        System.Array.Clear(occupant, 0, occupant.Length); //last level's enemies are gone, so every slot is free again
 
         if (level == 1)
         {
@@ -194,7 +208,85 @@ public class EnemySpawner : MonoBehaviour
     //Spawns one enemy at a grid spot and counts it, so the level's enemy total can't get out of sync with the layout
     void Spawn(GameObject enemy, int row, int column)
     {
-        Instantiate(enemy, spawn[row, column].transform.position, transform.rotation);
+        occupant[row, column] = Instantiate(enemy, spawn[row, column].transform.position, transform.rotation);
         spawnedCount++;
+    }
+
+
+    //// Slot lookups, used by the enemies that move around the formation ////////////////////////
+
+    //Row 0 only has 5 spawn points, and anything off the grid has none, so not every row/column pair is a real slot
+    public bool SlotExists(int row, int column)
+    {
+        return row >= 0 && row < Rows && column >= 0 && column < Columns && spawn[row, column] != null;
+    }
+
+    //Free means the slot is real and whoever was there is gone (Unity reports destroyed objects as null)
+    public bool IsSlotFree(int row, int column)
+    {
+        return SlotExists(row, column) && occupant[row, column] == null;
+    }
+
+    public Vector3 SlotPosition(int row, int column)
+    {
+        return spawn[row, column].transform.position;
+    }
+
+    //Which slot an enemy was spawned into. False if it wasn't spawned through the grid at all (the dev tester does that)
+    public bool TryFindSlotOf(GameObject enemy, out int row, out int column)
+    {
+        for (row = 0; row < Rows; row++)
+        {
+            for (column = 0; column < Columns; column++)
+            {
+                if (occupant[row, column] == enemy) return true;
+            }
+        }
+
+        row = -1;
+        column = -1;
+        return false;
+    }
+
+    public void ClaimSlot(GameObject enemy, int row, int column)
+    {
+        if (SlotExists(row, column)) occupant[row, column] = enemy;
+    }
+
+    //Gives up whatever slot this enemy holds, so others can move into it while it's away
+    public void ReleaseSlot(GameObject enemy)
+    {
+        for (int row = 0; row < Rows; row++)
+        {
+            for (int column = 0; column < Columns; column++)
+            {
+                if (occupant[row, column] == enemy) occupant[row, column] = null;
+            }
+        }
+    }
+
+    //Picks one empty slot at random, with every free slot equally likely (reservoir sampling, so nothing is allocated)
+    public bool TryFindFreeSlot(out int row, out int column)
+    {
+        row = -1;
+        column = -1;
+        int found = 0;
+
+        for (int r = FirstEnemyRow; r < Rows; r++)
+        {
+            for (int c = 0; c < Columns; c++)
+            {
+                if (!IsSlotFree(r, c)) continue;
+
+                found++;
+                if (Random.Range(0, found) == 0)
+                {
+                    row = r;
+                    column = c;
+                }
+            }
+        }
+
+        return found > 0;
     }
 }
