@@ -3,7 +3,7 @@ using UnityEngine;
 
 // Enemy D: a fast, armoured strafer. It sweeps its row as far left and as far right as it can -
 // the ends of its run are set by whichever slots its neighbours have left empty, so it gets more and more
-// room as the row is cleared. It fires short bursts of very fast, very inaccurate shots.
+// room as the row is cleared. It fires short bursts of fast, oversized, very inaccurate shots.
 //
 // It takes two hits. Surviving the first one enrages it: the subtle idle shake turns into a
 // violent vibration and it sweeps noticeably faster.
@@ -45,7 +45,8 @@ public class Enemy_D : MonoBehaviour
     [Header("Firing")]
     public int burstCount = 4;
     public float burstInterval = 0.07f;        // gap between shots inside one burst
-    public float burstProjectileSpeed = 14f;   // much faster than the A/Ab shots
+    public float burstProjectileSpeed = 9f;    // faster than the A/Ab shots (5), but slow enough to react to
+    public float burstProjectileScale = 1.6f;  // drawn bigger than everyone else's shots, so they're easy to spot
     public float burstSpread = 18f;            // and much sloppier
     public float minFireInterval = 2.5f;       // shortest possible time between bursts
     public float maxFireInterval = 4.5f;
@@ -196,12 +197,24 @@ public class Enemy_D : MonoBehaviour
             Projectile_A shot = Instantiate(projectile, transform.position + Vector3.down * 0.3f, transform.rotation).GetComponent<Projectile_A>();
             shot.projSpeed = burstProjectileSpeed;
             shot.spreadAngle = burstSpread;
+            Enlarge(shot.transform);
             AudioSource.PlayClipAtPoint(shoot, transform.position, 1.0f);
 
             if (i < burstCount - 1) yield return new WaitForSeconds(burstInterval);
         }
 
         canFire = true;
+    }
+
+    //D shares its laser prefab with A, Ab and C, so it scales up its own shots as they're fired.
+    //The laser's flames use local particle scaling, which ignores the parent, so each one is scaled as well
+    void Enlarge(Transform shot)
+    {
+        shot.localScale *= burstProjectileScale;
+        foreach (ParticleSystem particles in shot.GetComponentsInChildren<ParticleSystem>())
+        {
+            particles.transform.localScale *= burstProjectileScale;
+        }
     }
 
     void OnTriggerEnter(Collider col)
