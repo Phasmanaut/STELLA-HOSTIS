@@ -1,21 +1,23 @@
 using UnityEngine;
 
+// Enemy A: the basic grunt. It sways slowly from side to side around its formation slot and every
+// so often takes a single, slightly inaccurate shot at the player. One hit kills it.
 public class Enemy_A : MonoBehaviour
 {
     private GameStats gameStats;
     public GameObject projectile;
-    public GameObject floatingPoints;
+    public GameObject floatingPoints; //the score number that pops up where it died
     public AudioClip death;
     public AudioClip shoot;
     public GameObject Explosion;
     public GameObject gooPrefab;
 
     private int points = 50;
-    private float speed = 0.5f;
-    private float duration = 3f;
+    private float speed = 0.5f;    // how fast it sways
+    private float duration = 3f;   // seconds per swing before it turns around, so it sways about 0.75 either side of its slot
     private float timeElapsed = 0f;
     private bool moveRight = true;
-    public string explosionType = "EnemyA";
+    public string explosionType = "EnemyA"; //which shrapnel effect Explosion_Effect plays when it dies
 
     [Header("Firing")]
     public float minFireInterval = 1.5f; // shortest possible time between shots
@@ -38,10 +40,11 @@ public class Enemy_A : MonoBehaviour
     void Start()
     {
         gameStats = GameObject.FindWithTag("GameStats").GetComponent<GameStats>();
-        timeElapsed += duration / 2;
+        timeElapsed += duration / 2; //half a swing's head start, so it sways evenly either side of its slot instead of off to one side
 
         nextFireTime = Random.Range(minFireInterval, maxFireInterval);
 
+        //It spawns in its slot, then gets moved up above the screen so it can fly down into it
         spawnPosition = transform.position;
         entryStartPosition = spawnPosition + Vector3.up * entryHeight + Vector3.right * (spawnPosition.x * entryAngleFactor);
         transform.position = entryStartPosition;
@@ -50,7 +53,7 @@ public class Enemy_A : MonoBehaviour
 
     void Update()
     {
-        if (isEntering)
+        if (isEntering) //still flying in - it doesn't sway or shoot until it has landed
         {
             entryElapsed += Time.deltaTime;
             float t = Mathf.Clamp01(entryElapsed / entryDuration);
@@ -60,11 +63,12 @@ public class Enemy_A : MonoBehaviour
             return;
         }
 
-        if (gameStats.playerAlive)
+        if (gameStats.playerAlive) //everything freezes when the player dies
         {
             timeElapsed += Time.deltaTime;
             fireTimer += Time.deltaTime;
 
+            //Sway: slide one way until the swing time is up, then turn around
             if (moveRight)
             {
                 transform.Translate(speed * Time.deltaTime, 0, 0);
@@ -84,12 +88,13 @@ public class Enemy_A : MonoBehaviour
             {
                 fireTimer = 0f;
                 nextFireTime = Random.Range(minFireInterval, maxFireInterval); // rolls a new random interval
-                Instantiate(projectile, this.transform);
+                Instantiate(projectile, this.transform); //spawned as a child so it starts right here - Projectile_A unparents itself and aims at the player
                 AudioSource.PlayClipAtPoint(shoot, transform.position, 1.0f);
             }
         }
     }
 
+    //One hit from the player kills it: score popup, explosion, points, and a goo drop
     void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.tag == "Player Projectile")
