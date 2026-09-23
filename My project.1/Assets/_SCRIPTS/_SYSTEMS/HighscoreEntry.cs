@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 
 // Arcade-style initials entry at the end of a run, then sends the score to the highscore list
@@ -19,10 +20,11 @@ public class HighscoreEntry : MonoBehaviour
     private string initials = "";
     private bool acceptingInput;
 
-    //Touch screens have no keyboard here, so initials are picked arcade-style with the joystick
+    //Touch screens and controllers have no keyboard, so initials are picked arcade-style with the stick
     private char currentLetter = 'A'; //the letter being picked for the next slot
     private float letterRepeatTimer; //holding the stick up/down keeps scrolling through letters
     private bool backHeld; //so one push left only removes one letter
+    private bool padMode; //a controller is being used, so show its prompts. Typing on the keyboard switches back
 
     //The shapes of the JSON sent to and received from the website
     [Serializable] public class ScoreSubmission { public string name; public int score; public int level; }
@@ -43,8 +45,8 @@ public class HighscoreEntry : MonoBehaviour
     {
         if (!acceptingInput) return;
 
-        if (MobileControls.Active) UpdateTouchEntry();
-        else UpdateKeyboardEntry();
+        if (!MobileControls.Active) UpdateKeyboardEntry();
+        if (acceptingInput) UpdatePickerEntry(); //the keyboard may have just saved or skipped
     }
 
     //Desktop: type the letters, backspace to fix one, enter to save, esc to skip
@@ -52,9 +54,14 @@ public class HighscoreEntry : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            acceptingInput = false;
-            screenText.text = $"SCORE {score}\nNOT SAVED";
+            Skip();
             return;
+        }
+
+        if (padMode && Input.inputString.Length > 0)
+        {
+            padMode = false; //back on the keyboard, so show the typing prompts again
+            ShowInitials();
         }
 
         //inputString holds the characters typed this frame: letters, '\b' for backspace, '\n' or '\r' for enter
@@ -80,10 +87,39 @@ public class HighscoreEntry : MonoBehaviour
         }
     }
 
-    //Touch screens: stick up/down picks a letter, fire locks it in (and saves once all 3 are in), stick left goes back
-    void UpdateTouchEntry()
+    //Touch screens and controllers: stick up/down picks a letter, fire (A) locks it in and saves once all 3 are in,
+    //a firm push left (or B) goes back, and Start skips saving
+    void UpdatePickerEntry()
     {
-        float vertical = MobileControls.Stick.y;
+        Vector2 stick = MobileControls.Stick;
+        bool nextPressed = MobileControls.FirePressed;
+        bool backPressed = false;
+
+        Gamepad pad = Gamepad.current;
+        if (pad != null)
+        {
+            Vector2 padStick = pad.leftStick.ReadValue() + pad.dpad.ReadValue();
+            bool padNext = pad.buttonSouth.wasPressedThisFrame;
+            bool padBack = pad.buttonEast.wasPressedThisFrame;
+            bool padSkip = pad.startButton.wasPressedThisFrame;
+
+            if (!padMode && (padStick.magnitude > MobileControls.DeadZone || padNext || padBack || padSkip))
+            {
+                padMode = true; //the controller was picked up, so show its prompts
+                ShowInitials();
+            }
+            if (padSkip)
+            {
+                Skip();
+                return;
+            }
+
+            stick += padStick;
+            nextPressed |= padNext;
+            backPressed = padBack;
+        }
+
+        float vertical = stick.y;
         int scroll = vertical > MobileControls.DeadZone ? 1 : vertical < -MobileControls.DeadZone ? -1 : 0;
         if (scroll == 0)
         {
@@ -100,15 +136,15 @@ public class HighscoreEntry : MonoBehaviour
             }
         }
 
-        bool back = MobileControls.Stick.x < -0.7f && Mathf.Abs(vertical) < 0.5f; //a firm push left, not a diagonal
-        if (back && !backHeld && initials.Length > 0)
+        bool pushedLeft = stick.x < -0.7f && Mathf.Abs(vertical) < 0.5f; //a firm push left, not a diagonal
+        if (((pushedLeft && !backHeld) || backPressed) && initials.Length > 0)
         {
             initials = initials.Substring(0, initials.Length - 1);
             ShowInitials();
         }
-        backHeld = back;
+        backHeld = pushedLeft;
 
-        if (MobileControls.FirePressed)
+        if (nextPressed)
         {
             if (initials.Length < InitialsLength)
             {
@@ -125,22 +161,30 @@ public class HighscoreEntry : MonoBehaviour
 
     void ShowInitials()
     {
-        if (MobileControls.Active)
+        if (padMode || MobileControls.Active)
         {
             if (initials.Length < InitialsLength)
             {
                 string slots = $"{initials}[{currentLetter}]" + new string('_', InitialsLength - initials.Length - 1); //e.g. "A[B]_"
-                screenText.text = $"SCORE {score}\nINITIALS: {slots}\nSTICK: A-Z  FIRE: NEXT";
+                string hint = padMode ? "STICK: A-Z  A: NEXT  B: BACK" : "STICK: A-Z  FIRE: NEXT";
+                screenText.text = $"SCORE {score}\nINITIALS: {slots}\n{hint}";
             }
             else
             {
-                screenText.text = $"SCORE {score}\nINITIALS: {initials}\nFIRE: SAVE  LEFT: BACK";
+                string hint = padMode ? "A: SAVE  B: BACK  START: SKIP" : "FIRE: SAVE  LEFT: BACK";
+                screenText.text = $"SCORE {score}\nINITIALS: {initials}\n{hint}";
             }
             return;
         }
 
         string typed = initials.PadRight(InitialsLength, '_'); //e.g. "AB_"
         screenText.text = $"SCORE {score}\nENTER INITIALS: {typed}\nENTER: SAVE  ESC: SKIP";
+    }
+
+    void Skip()
+    {
+        acceptingInput = false;
+        screenText.text = $"SCORE {score}\nNOT SAVED";
     }
 
     IEnumerator Submit()
@@ -161,8 +205,10 @@ public class HighscoreEntry : MonoBehaviour
             else
             {
                 Debug.LogWarning($"[HighscoreEntry] Couldn't save score: {request.error} {request.downloadHandler.text}");
-                screenText.text = MobileControls.Active ? "COULDN'T SAVE SCORE\nFIRE: RETRY" : "COULDN'T SAVE SCORE\nENTER: RETRY  ESC: SKIP";
-                acceptingInput = true; //initials are still filled in, so enter (or fire) sends it again
+                screenText.text = padMode ? "COULDN'T SAVE SCORE\nA: RETRY  START: SKIP"
+                    : MobileControls.Active ? "COULDN'T SAVE SCORE\nFIRE: RETRY"
+                    : "COULDN'T SAVE SCORE\nENTER: RETRY  ESC: SKIP";
+                acceptingInput = true; //initials are still filled in, so enter (or fire, or A) sends it again
             }
         }
     }

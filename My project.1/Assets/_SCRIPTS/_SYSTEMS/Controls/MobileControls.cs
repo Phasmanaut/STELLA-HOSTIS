@@ -7,9 +7,10 @@ using DeviceScreen = UnityEngine.Device.Screen;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-// On-screen joystick and fire button for phones and tablets, including mobile browsers.
+// On-screen joystick, fire and dodge buttons for phones and tablets, including mobile browsers.
 // Touching the left half of the screen grabs the joystick (it jumps to your thumb); touching
-// anywhere else fires. While the phone is held upright, a popup asks the player to turn it sideways
+// anywhere else fires, except the dodge button (above the fire button), which dodges instead.
+// While the phone is held upright, a popup asks the player to turn it sideways
 // and the game pauses. It creates itself when the game starts on a mobile device, so nothing
 // needs to be set up in the scene. To try it in the editor, open the Device Simulator
 // (Window > General > Device Simulator), which pretends to be a phone and turns clicks into touches.
@@ -23,6 +24,7 @@ public class MobileControls : MonoBehaviour
     public static Vector2 Stick { get; private set; } //-1 to 1 on each axis
     public static bool Fire { get; private set; } //held down
     public static bool FirePressed { get; private set; } //true only on the frame the fire button goes down
+    public static bool DodgePressed { get; private set; } //true only on the frame a finger lands on the dodge button
 
     //Sizes and positions are in canvas units, laid out for a 1920x1080 screen and scaled to fit
     private const float StickRadius = 130f;
@@ -33,6 +35,13 @@ public class MobileControls : MonoBehaviour
     private static readonly Color ButtonColor = new Color(1f, 0.35f, 0.3f, 0.35f);
     private static readonly Color ButtonPressedColor = new Color(1f, 0.35f, 0.3f, 0.65f);
 
+    //The dodge button is a real button, so unlike the fire button it stays on screen
+    private const float DodgeButtonRadius = 70f;
+    private const float DodgeHitRadius = 95f; //a little bigger than it looks, so a thumb doesn't have to land dead on it
+    private static readonly Vector2 DodgeButtonPosition = new Vector2(-230f, 470f); //from the bottom-right corner, above the fire button
+    private static readonly Color DodgeButtonColor = new Color(0.4f, 0.8f, 1f, 0.35f);
+    private static readonly Color DodgeButtonPressedColor = new Color(0.4f, 0.8f, 1f, 0.65f);
+
     //The fire button is only a hint (any touch outside the joystick fires), so it fades away once the player has used it a few times
     private const int TapsBeforeHidingButton = 1;
     private const float ButtonFadeSeconds = 1f;
@@ -42,8 +51,10 @@ public class MobileControls : MonoBehaviour
     private RectTransform stickKnob;
     private Image buttonImage;
     private CanvasGroup buttonGroup; //fades the button and its label together
+    private Image dodgeImage;
     private int fireTaps;
     private int stickFingerId = -1; //which finger is on the joystick (-1 = none)
+    private int dodgeFingerId = -1; //which finger pressed the dodge button (-1 = none). It doesn't fire until it's lifted
     private GameObject rotatePopup; //covers the screen and pauses the game while the phone is held upright
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -69,6 +80,7 @@ public class MobileControls : MonoBehaviour
         Stick = Vector2.zero;
         Fire = false;
         FirePressed = false;
+        DodgePressed = false;
     }
 
     void Update()
@@ -85,12 +97,18 @@ public class MobileControls : MonoBehaviour
             Stick = Vector2.zero;
             Fire = false;
             FirePressed = false;
+            DodgePressed = false;
             stickFingerId = -1;
+            dodgeFingerId = -1;
             return;
         }
 
         bool stickHeld = false;
         bool fireHeld = false;
+        bool dodgeTapped = false;
+
+        Vector2 canvasSize = new Vector2(DeviceScreen.width, DeviceScreen.height) / canvas.scaleFactor;
+        Vector2 dodgeCenter = new Vector2(canvasSize.x, 0f) + DodgeButtonPosition; //the button hangs off the bottom-right corner
 
         foreach (Touch touch in Touch.activeTouches)
         {
@@ -101,7 +119,6 @@ public class MobileControls : MonoBehaviour
             if (touch.phase == TouchPhase.Began && stickFingerId == -1 && touch.screenPosition.x < DeviceScreen.width * 0.5f)
             {
                 stickFingerId = touch.touchId;
-                Vector2 canvasSize = new Vector2(DeviceScreen.width, DeviceScreen.height) / canvas.scaleFactor;
                 stickBase.anchoredPosition = new Vector2(
                     Mathf.Clamp(canvasPosition.x, StickRadius, canvasSize.x - StickRadius),
                     Mathf.Clamp(canvasPosition.y, StickRadius, canvasSize.y - StickRadius)); //keep the ring fully on screen
@@ -119,8 +136,20 @@ public class MobileControls : MonoBehaviour
                 stickKnob.anchoredPosition = offset;
                 Stick = offset / StickRadius;
             }
+            else if (touch.touchId == dodgeFingerId)
+            {
+                if (lifted) dodgeFingerId = -1; //the dodge finger never fires, even if it slides off the button
+            }
             else if (!lifted)
             {
+                //A finger that lands on the dodge button dodges instead of firing. One that slides onto it while firing keeps firing
+                if (touch.phase == TouchPhase.Began && Vector2.Distance(canvasPosition, dodgeCenter) <= DodgeHitRadius)
+                {
+                    dodgeFingerId = touch.touchId;
+                    dodgeTapped = true;
+                    continue;
+                }
+
                 fireHeld = true; //any other finger fires
             }
         }
@@ -135,6 +164,9 @@ public class MobileControls : MonoBehaviour
         FirePressed = fireHeld && !Fire;
         Fire = fireHeld;
         UpdateFireButton();
+
+        DodgePressed = dodgeTapped;
+        dodgeImage.color = dodgeFingerId != -1 ? DodgeButtonPressedColor : DodgeButtonColor;
     }
 
     void UpdateFireButton()
@@ -177,6 +209,11 @@ public class MobileControls : MonoBehaviour
         buttonGroup.blocksRaycasts = false;
 
         CreateLabel(button, "FIRE", 30f, new Color(1f, 1f, 1f, 0.85f));
+
+        RectTransform dodgeButton = CreateImage("DodgeButton", transform, disc, DodgeButtonRadius, DodgeButtonColor, new Vector2(1f, 0f));
+        dodgeButton.anchoredPosition = DodgeButtonPosition;
+        dodgeImage = dodgeButton.GetComponent<Image>();
+        CreateLabel(dodgeButton, "DODGE", 26f, new Color(1f, 1f, 1f, 0.85f));
 
         //"Turn your phone" popup: a dark full-screen panel, built last so it covers the controls
         rotatePopup = new GameObject("RotatePopup", typeof(RectTransform), typeof(Image));
