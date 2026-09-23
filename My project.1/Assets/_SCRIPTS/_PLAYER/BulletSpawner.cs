@@ -6,8 +6,9 @@ public class BulletSpawner : MonoBehaviour
     public GameObject bullet;
     public GameObject player;
     Boolean canFire = true;
-    public float cooldown =1f;
-    
+    public float fireCooldown = 0.67f; //seconds between shots
+    private float cooldown; //counts down after each shot
+
     public AudioSource sound_fire;
 
 
@@ -27,7 +28,7 @@ public class BulletSpawner : MonoBehaviour
                 Instantiate(bullet, transform.position, transform.rotation);
                 sound_fire.Play();
                 canFire = false;
-                cooldown =1f;
+                cooldown = fireCooldown;
             }
         }
         else if (!canFire)
