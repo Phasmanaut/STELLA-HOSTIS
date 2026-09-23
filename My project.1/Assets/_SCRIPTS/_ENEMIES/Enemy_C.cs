@@ -145,16 +145,37 @@ public class Enemy_C : MonoBehaviour
     {
         Vector3 target = anchor - Vector3.up * retreatDistance - Vector3.forward * retreatBackDistance; //undo the retreat, as a fallback
 
-        if (EnemySpawner.Instance != null && EnemySpawner.Instance.TryFindFreeSlot(out int freeRow, out int freeColumn))
+        EnemySpawner spawner = EnemySpawner.Instance;
+        if (spawner != null)
         {
-            EnemySpawner.Instance.ClaimSlot(gameObject, freeRow, freeColumn); //claimed straight away so another C cannot pick the same one
-            target = EnemySpawner.Instance.SlotPosition(freeRow, freeColumn);
+            //Somewhere with elbow room if it can, otherwise any empty slot that's out of a D's way
+            bool found = spawner.TryFindFreeSlot(out int freeRow, out int freeColumn, HasElbowRoom)
+                      || spawner.TryFindFreeSlot(out freeRow, out freeColumn, OutOfStrafersWay);
+
+            if (found)
+            {
+                spawner.ClaimSlot(gameObject, freeRow, freeColumn); //claimed straight away so another C cannot pick the same one
+                target = spawner.SlotPosition(freeRow, freeColumn);
+            }
         }
 
         //Line up above the new slot and glide down into it. This jump happens off screen, behind the top edge
         Vector3 start = target + Vector3.up * entryHeight + Vector3.right * (target.x * entryAngleFactor);
         anchor = start;
         yield return MoveOver(start, target, returnDuration);
+    }
+
+    //A D sweeps through the empty slots in its row, so landing in one would put this right in its path
+    bool OutOfStrafersWay(int row, int column)
+    {
+        return !EnemySpawner.Instance.RowHas<Enemy_D>(row);
+    }
+
+    //Nobody directly either side (they sway, and would slide into it), and out of any D's way
+    bool HasElbowRoom(int row, int column)
+    {
+        EnemySpawner spawner = EnemySpawner.Instance;
+        return !spawner.IsSlotTaken(row, column - 1) && !spawner.IsSlotTaken(row, column + 1) && OutOfStrafersWay(row, column);
     }
 
     //Eases the anchor from one point to another. Time only advances while the player is alive, so a

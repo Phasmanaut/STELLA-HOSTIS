@@ -55,12 +55,14 @@ public class EnemySpawner : MonoBehaviour
     //Grid: rows 1-6 go top to bottom (row 0 is the item row), columns 0-8 go left to right.
     //Enemies sway side to side (A ~0.75, Ab ~1.1, B ~0.5), so different types in the same row
     //are kept at least 2 columns apart so they don't slide through each other.
+    //C doesn't sway, it hops to a new empty slot every few seconds. D sweeps its row through the
+    //empty slots, so give it gaps to run in, and never put two D's in one row - they'd run into each other.
     public int SpawnLevel(int level)
     {
         spawnedCount = 0;
         System.Array.Clear(occupant, 0, occupant.Length); //last level's enemies are gone, so every slot is free again
 
-        if (level == 1)
+        if (level == 1) //WARM-UP: just A's
         {
             Spawn(enemy_A, 2, 0);
             Spawn(enemy_A, 2, 2);
@@ -69,126 +71,127 @@ public class EnemySpawner : MonoBehaviour
             Spawn(enemy_A, 3, 2);
             Spawn(enemy_A, 3, 6);
         }
-        else if (level == 2)
+        else if (level == 2) //TWIN LINES: two rows of A's with the first Ab's out on the flanks
         {
-            Spawn(enemy_A, 1, 3);
             Spawn(enemy_A, 1, 2);
+            Spawn(enemy_A, 1, 3);
             Spawn(enemy_A, 1, 5);
             Spawn(enemy_A, 1, 6);
-            Spawn(enemy_A, 2, 2);
-            Spawn(enemy_A, 2, 4);
-            Spawn(enemy_A, 2, 6);
-            Spawn(enemy_Ab, 4, 6);
-            Spawn(enemy_Ab, 4, 2);
-        }
-        else if (level == 3)
-        {
-            Spawn(enemy_A, 1, 3);
-            Spawn(enemy_A, 1, 2);
-            Spawn(enemy_A, 1, 5);
-            Spawn(enemy_A, 1, 6);
-            Spawn(enemy_Ab, 2, 2);
-            Spawn(enemy_Ab, 2, 4);
-            Spawn(enemy_Ab, 2, 6);
-            Spawn(enemy_Ab, 3, 6);
-            Spawn(enemy_Ab, 3, 2);
-        }
-        else if (level == 4)
-        {
-            Spawn(enemy_B, 1, 0);
-            Spawn(enemy_A, 1, 2);
-            Spawn(enemy_B, 1, 8);
-            Spawn(enemy_Ab, 1, 6);
-            Spawn(enemy_Ab, 2, 2);
-            Spawn(enemy_Ab, 2, 4);
-            Spawn(enemy_Ab, 2, 6);
-            Spawn(enemy_A, 4, 6);
-            Spawn(enemy_A, 4, 2);
-        }
-        else if (level == 5) //ARROWHEAD: a V pointing at the player, B gunners on the wing tips
-        {
-            Spawn(enemy_B, 1, 0);
-            Spawn(enemy_B, 1, 8);
-            Spawn(enemy_Ab, 2, 1);
-            Spawn(enemy_A, 2, 4);
-            Spawn(enemy_Ab, 2, 7);
-            Spawn(enemy_Ab, 3, 2);
+            Spawn(enemy_Ab, 2, 0);
+            Spawn(enemy_Ab, 2, 8);
+            Spawn(enemy_A, 3, 3);
             Spawn(enemy_A, 3, 4);
-            Spawn(enemy_Ab, 3, 6);
-            Spawn(enemy_A, 4, 3);
-            Spawn(enemy_A, 4, 5);
-            Spawn(enemy_A, 5, 4);
+            Spawn(enemy_A, 3, 5);
         }
-        else if (level == 6) //SHIELD WALL: a row of A's soaks up bullets while the B's charge behind it
+        else if (level == 3) //GUNNERS: the first B's, perched up in the top corners
         {
             Spawn(enemy_B, 1, 1);
-            Spawn(enemy_B, 1, 4);
             Spawn(enemy_B, 1, 7);
-            Spawn(enemy_Ab, 2, 0);
-            Spawn(enemy_Ab, 2, 4);
-            Spawn(enemy_Ab, 2, 8);
+            Spawn(enemy_A, 2, 3);
+            Spawn(enemy_A, 2, 4);
+            Spawn(enemy_A, 2, 5);
+            Spawn(enemy_Ab, 3, 0);
+            Spawn(enemy_Ab, 3, 8);
+            Spawn(enemy_A, 4, 2);
+            Spawn(enemy_A, 4, 4);
+            Spawn(enemy_A, 4, 6);
+        }
+        else if (level == 4) //SHAKERS: the first C's - they won't stay where they started for long
+        {
+            Spawn(enemy_C, 1, 1);
+            Spawn(enemy_C, 1, 7);
+            Spawn(enemy_A, 2, 2);
+            Spawn(enemy_A, 2, 3);
+            Spawn(enemy_A, 2, 4);
+            Spawn(enemy_A, 2, 5);
+            Spawn(enemy_A, 2, 6);
+            Spawn(enemy_Ab, 4, 1);
+            Spawn(enemy_Ab, 4, 4);
+            Spawn(enemy_Ab, 4, 7);
+        }
+        else if (level == 5) //STRAFER: the first D, alone in its row so it has the whole width to sweep
+        {
+            Spawn(enemy_A, 1, 1);
+            Spawn(enemy_A, 1, 2);
+            Spawn(enemy_A, 1, 3);
+            Spawn(enemy_A, 1, 5);
+            Spawn(enemy_A, 1, 6);
+            Spawn(enemy_A, 1, 7);
+            Spawn(enemy_D, 3, 4);
+            Spawn(enemy_Ab, 4, 1);
+            Spawn(enemy_Ab, 4, 7);
+            Spawn(enemy_A, 5, 4);
+        }
+        else if (level == 6) //CROSSFIRE: B's up top, a D sweeping under them, and C's hopping around above an A wall
+        {
+            Spawn(enemy_B, 1, 0);
+            Spawn(enemy_B, 1, 8);
+            Spawn(enemy_D, 2, 4);
+            Spawn(enemy_C, 3, 2);
+            Spawn(enemy_C, 3, 6);
             Spawn(enemy_A, 4, 1);
             Spawn(enemy_A, 4, 2);
             Spawn(enemy_A, 4, 3);
-            Spawn(enemy_A, 4, 4);
             Spawn(enemy_A, 4, 5);
             Spawn(enemy_A, 4, 6);
             Spawn(enemy_A, 4, 7);
+            Spawn(enemy_Ab, 5, 4);
         }
-        else if (level == 7) //CHECKERBOARD: an Ab swarm - fewer B's, but a lot more fast shooters
+        else if (level == 7) //THE CAGE: two D's boxed in by their rows - every neighbour you clear gives one more room to run
+        {
+            Spawn(enemy_C, 1, 2);
+            Spawn(enemy_C, 1, 6);
+            Spawn(enemy_A, 2, 0);
+            Spawn(enemy_A, 2, 1);
+            Spawn(enemy_D, 2, 4);
+            Spawn(enemy_A, 2, 7);
+            Spawn(enemy_A, 2, 8);
+            Spawn(enemy_Ab, 4, 0);
+            Spawn(enemy_Ab, 4, 1);
+            Spawn(enemy_D, 4, 4);
+            Spawn(enemy_Ab, 4, 7);
+            Spawn(enemy_Ab, 4, 8);
+        }
+        else if (level == 8) //PINCER: two claws reach down towards the player while a D paces between the B's
         {
             Spawn(enemy_B, 1, 1);
-            Spawn(enemy_B, 1, 7);
-            Spawn(enemy_Ab, 2, 0);
-            Spawn(enemy_Ab, 2, 2);
-            Spawn(enemy_Ab, 2, 4);
-            Spawn(enemy_Ab, 2, 6);
-            Spawn(enemy_Ab, 2, 8);
-            Spawn(enemy_A, 3, 1);
-            Spawn(enemy_A, 3, 3);
-            Spawn(enemy_A, 3, 5);
-            Spawn(enemy_A, 3, 7);
-            Spawn(enemy_Ab, 4, 2);
-            Spawn(enemy_Ab, 4, 6);
-        }
-        else if (level == 8) //PINCER: two claws reach down to the lowest row, closest to the player
-        {
-            Spawn(enemy_B, 1, 1);
-            Spawn(enemy_B, 1, 4);
+            Spawn(enemy_D, 1, 4);
             Spawn(enemy_B, 1, 7);
             Spawn(enemy_Ab, 2, 0);
             Spawn(enemy_Ab, 2, 8);
             Spawn(enemy_Ab, 3, 0);
-            Spawn(enemy_A, 3, 4);
+            Spawn(enemy_C, 3, 3);
+            Spawn(enemy_C, 3, 5);
             Spawn(enemy_Ab, 3, 8);
             Spawn(enemy_A, 4, 0);
-            Spawn(enemy_A, 4, 4);
             Spawn(enemy_A, 4, 8);
             Spawn(enemy_A, 5, 1);
             Spawn(enemy_A, 5, 7);
             Spawn(enemy_A, 6, 2);
             Spawn(enemy_A, 6, 6);
         }
-        else if (level == 9) //FORTRESS: B's hold all four corners of a box with an Ab core inside
+        else if (level == 9) //FORTRESS: B's and a D on the battlements, C's and Ab's inside the walls, and a second D patrolling out front
         {
             Spawn(enemy_B, 1, 0);
-            Spawn(enemy_Ab, 1, 2);
-            Spawn(enemy_Ab, 1, 4);
-            Spawn(enemy_Ab, 1, 6);
+            Spawn(enemy_D, 1, 4);
             Spawn(enemy_B, 1, 8);
             Spawn(enemy_A, 2, 0);
-            Spawn(enemy_Ab, 2, 4);
+            Spawn(enemy_C, 2, 3);
+            Spawn(enemy_C, 2, 5);
             Spawn(enemy_A, 2, 8);
             Spawn(enemy_A, 3, 0);
+            Spawn(enemy_Ab, 3, 3);
             Spawn(enemy_Ab, 3, 4);
+            Spawn(enemy_Ab, 3, 5);
             Spawn(enemy_A, 3, 8);
-            Spawn(enemy_B, 4, 0);
+            Spawn(enemy_A, 4, 0);
             Spawn(enemy_A, 4, 2);
             Spawn(enemy_A, 4, 3);
             Spawn(enemy_A, 4, 4);
             Spawn(enemy_A, 4, 5);
             Spawn(enemy_A, 4, 6);
-            Spawn(enemy_B, 4, 8);
+            Spawn(enemy_A, 4, 8);
+            Spawn(enemy_D, 5, 4);
         }
         else if (level == 10) //SWARM MODE: starts after the demo's thank-you screen
         {
@@ -225,6 +228,22 @@ public class EnemySpawner : MonoBehaviour
     public bool IsSlotFree(int row, int column)
     {
         return SlotExists(row, column) && occupant[row, column] == null;
+    }
+
+    //Taken means the slot is real and somebody is still in it
+    public bool IsSlotTaken(int row, int column)
+    {
+        return SlotExists(row, column) && occupant[row, column] != null;
+    }
+
+    //True if anybody in the row has the given script - Enemy_C uses it to stay out of Enemy_D's lane
+    public bool RowHas<T>(int row) where T : Component
+    {
+        for (int column = 0; column < Columns; column++)
+        {
+            if (IsSlotTaken(row, column) && occupant[row, column].GetComponent<T>() != null) return true;
+        }
+        return false;
     }
 
     public Vector3 SlotPosition(int row, int column)
@@ -265,8 +284,9 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    //Picks one empty slot at random, with every free slot equally likely (reservoir sampling, so nothing is allocated)
-    public bool TryFindFreeSlot(out int row, out int column)
+    //Picks one empty slot at random, with every free slot equally likely (reservoir sampling, so nothing is allocated).
+    //Pass a filter to turn down slots the caller doesn't want - it's asked about each free slot by row and column
+    public bool TryFindFreeSlot(out int row, out int column, System.Func<int, int, bool> allowed = null)
     {
         row = -1;
         column = -1;
@@ -277,6 +297,7 @@ public class EnemySpawner : MonoBehaviour
             for (int c = 0; c < Columns; c++)
             {
                 if (!IsSlotFree(r, c)) continue;
+                if (allowed != null && !allowed(r, c)) continue;
 
                 found++;
                 if (Random.Range(0, found) == 0)

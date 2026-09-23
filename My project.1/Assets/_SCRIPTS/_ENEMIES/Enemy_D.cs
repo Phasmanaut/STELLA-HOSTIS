@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 
 // Enemy D: a fast, armoured strafer. It sweeps its row as far left and as far right as it can -
-// the ends of its run are whatever slots its neighbours have left empty, so it gets more and more
+// the ends of its run are set by whichever slots its neighbours have left empty, so it gets more and more
 // room as the row is cleared. It fires short bursts of very fast, very inaccurate shots.
 //
 // It takes two hits. Surviving the first one enrages it: the subtle idle shake turns into a
@@ -149,8 +149,8 @@ public class Enemy_D : MonoBehaviour
         MeasureRow(); //neighbours may have died since the last sweep, which opens up more room
     }
 
-    //Works out how far it can run in each direction: out from its own slot until it reaches one
-    //that's still occupied, or the end of the row.
+    //Works out how far it can run in each direction: out from its own slot across the empty ones, stopping
+    //a slot short of the next enemy (that one sways, and would slide into it), or at the end of the row.
     void MeasureRow()
     {
         if (!hasSlot || EnemySpawner.Instance == null)
@@ -164,10 +164,10 @@ public class Enemy_D : MonoBehaviour
         EnemySpawner spawner = EnemySpawner.Instance;
 
         int leftColumn = column;
-        while (spawner.IsSlotFree(row, leftColumn - 1)) leftColumn--;
+        while (spawner.IsSlotFree(row, leftColumn - 1) && !spawner.IsSlotTaken(row, leftColumn - 2)) leftColumn--;
 
         int rightColumn = column;
-        while (spawner.IsSlotFree(row, rightColumn + 1)) rightColumn++;
+        while (spawner.IsSlotFree(row, rightColumn + 1) && !spawner.IsSlotTaken(row, rightColumn + 2)) rightColumn++;
 
         leftLimit = spawner.SlotPosition(row, leftColumn).x;
         rightLimit = spawner.SlotPosition(row, rightColumn).x;
