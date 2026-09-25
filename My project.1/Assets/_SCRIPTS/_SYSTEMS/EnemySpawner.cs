@@ -310,4 +310,31 @@ public class EnemySpawner : MonoBehaviour
 
         return found > 0;
     }
+
+
+    //// Dev mode: one extra enemy on demand (GameStats.SpawnDevEnemy, from the website's cheat panel) ////
+
+    //Drops one enemy of the given type ("A", "Ab", "B", "C" or "D") into a random empty slot and returns it,
+    //or null if the type is unknown or there's no room. A D never joins a row that already has one, like in the layouts above
+    public GameObject SpawnExtra(string type)
+    {
+        GameObject prefab = type switch
+        {
+            "A" => enemy_A,
+            "Ab" => enemy_Ab,
+            "B" => enemy_B,
+            "C" => enemy_C,
+            "D" => enemy_D,
+            _ => null,
+        };
+        if (prefab == null) return null;
+
+        System.Func<int, int, bool> allowed = null;
+        if (type == "D") allowed = (row, column) => !RowHas<Enemy_D>(row);
+        if (!TryFindFreeSlot(out int freeRow, out int freeColumn, allowed)) return null;
+
+        GameObject enemy = Instantiate(prefab, spawn[freeRow, freeColumn].transform.position, transform.rotation);
+        occupant[freeRow, freeColumn] = enemy;
+        return enemy;
+    }
 }

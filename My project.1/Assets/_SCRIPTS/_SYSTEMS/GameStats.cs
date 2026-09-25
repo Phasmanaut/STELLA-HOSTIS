@@ -58,7 +58,10 @@ public class GameStats : MonoBehaviour
 
     //Highscores: when the run ends, HighscoreEntry lets the player send their score to the website
     private bool runOver; //set once the run ends (death or clearing the last level), so nothing can end it twice or carry on after it
-    public bool devModeUsed; //set by DebugTester; runs that used dev mode aren't sent to the highscore list
+    public bool devModeUsed; //set by DebugTester or the website's dev mode (WebDevBridge); runs that used dev mode aren't sent to the highscore list
+    public bool infiniteLife; //dev mode: hits still shake the screen, but cost no health
+
+    private Coroutine levelCountdown; //the between-level countdown, kept so a dev-mode level jump can cancel it
 
     void Start()
     {
@@ -171,7 +174,7 @@ public class GameStats : MonoBehaviour
             WinGame(timeBonus);
             return;
         }
-        StartCoroutine(LevelCountdown(timeBonus));
+        levelCountdown = StartCoroutine(LevelCountdown(timeBonus));
     }
 
     //Clearing the last level ends the run with a win
@@ -192,6 +195,8 @@ public class GameStats : MonoBehaviour
         if (devModeUsed)
         {
             Debug.Log("[GameStats] Dev mode was used this run, so the score isn't sent to the highscore list.");
+            screenText.fontSize = 20f; //back down from GAME OVER's size, the same as the initials entry would
+            screenText.text = $"SCORE {points}\nDEV MODE: NOT SAVED";
             yield break;
         }
         gameObject.AddComponent<HighscoreEntry>().Begin(screenText, points, level);
@@ -211,6 +216,8 @@ public class GameStats : MonoBehaviour
         if (runOver) return; //stray bullets after the run ended (e.g. after winning) don't count
 
         CameraShake();
+
+        if (infiniteLife) return; //dev mode: the hit is felt, but costs nothing
 
         if (playerHealth > 1)
         {
@@ -237,6 +244,47 @@ public class GameStats : MonoBehaviour
         screenText.fontSize = 40;
         screenText.text = $"GAME OVER";
         StartCoroutine(OfferHighscore());
+    }
+
+    //// Dev mode: the website's cheat panel, passed in by WebDevBridge ////////////////////////
+
+    //Marks the run as a dev run. There's no way back: once dev mode is used, the run's score stays off the highscore list
+    public void EnableDevMode()
+    {
+        devModeUsed = true;
+    }
+
+    //Starts any level straight away, clearing whatever is on screen first. Before the first level
+    //it also takes the start cube away, so the run simply begins at that level
+    public void JumpToLevel(int target)
+    {
+        if (runOver) return; //the run has already ended; reloading the game starts a new one
+        EnableDevMode();
+
+        if (levelCountdown != null) StopCoroutine(levelCountdown); //it would otherwise start its own level on top of this one
+        levelCountdown = null;
+        if (startCubeInstance != null) Destroy(startCubeInstance);
+
+        //The last level's enemies and their shots. Removing them this way isn't a kill, so it scores nothing
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) Destroy(enemy);
+        foreach (GameObject shot in GameObject.FindGameObjectsWithTag("EnemyProjectile")) Destroy(shot);
+
+        screenText.text = $" ";
+        level = Mathf.Clamp(target, 1, EnemySpawner.LastLevel);
+        LevelStart(level);
+        AudioSource.PlayClipAtPoint(startSound, transform.position, 5.0f);
+    }
+
+    //Adds one enemy to the level in progress. It counts towards clearing the level, so the level only ends
+    //once it's gone too. Does nothing between levels, where killing it would end a level that's already over
+    public bool SpawnDevEnemy(string type)
+    {
+        if (runOver || level == 0 || !timerActive) return false;
+        EnableDevMode();
+
+        if (enemySpawner.SpawnExtra(type) == null) return false; //unknown type, or no empty slot left
+        levelEnemies++;
+        return true;
     }
 
     public void UpdatePixelguy()
